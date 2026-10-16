@@ -44,7 +44,7 @@
 | Hosting | GitHub (repositorio público) + Vercel (deploy automático gratis) |
 | Presentación | Google Slides o Canva, con link a la app y al repositorio |
 | Idioma | La interfaz va en **español**; el código (nombres, comentarios), en **inglés** |
-| Paleta "Macaron" (reemplaza el acento verde oscuro) | Fondo `#FFFDF9`, texto `#25232B`; todo el texto en tono oscuro. Pares fondo pastel / acento: **Selección (entra/sale)** `#C4F0DC` / `#4BB88C` · **Pivote a 1** `#CFE2FF` / `#5B8DEF` · **Hacer cero** `#FFD9BF` / `#F0955A` · **Fila Z** `#E5D4FF` / `#9B6FE0`. El pastel va de fondo (fila que cambia, chip, operación activa); el acento solo en bordes, puntos y anillos |
+| Paleta "Macaron" (reemplaza el acento verde oscuro) | Fondo `#FFFDF9`, texto `#25232B`; todo el texto en tono oscuro. Pares fondo pastel / acento: **Selección (entra/sale)** `#C4F0DC` / `#4BB88C` · **Pivote a 1** `#CFE2FF` / `#5B8DEF` · **Hacer cero** `#FFD9BF` / `#F0955A` · **Fila Z** `#E5D4FF` / `#9B6FE0` · **Errores del editor** (agregado en 4a-1) `#FFDBDE` / `#E0606C`. El pastel va de fondo (fila que cambia, chip, operación activa); el acento solo en bordes, puntos y anillos |
 | Paso a paso | **Una operación por paso** (entra, sale, pivote a 1, cada "hacer cero", fila Z). Sin botón "Reproducir": el usuario avanza a su ritmo con Anterior/Siguiente, flechas del teclado o clic en la bitácora. La fila que cambia se pinta con el color de su operación, los valores viejos se ven tachados, tooltip con el cálculo (ej. "60 = 120 − 3 × 20") y **bitácora de operaciones** a la derecha |
 | Referencia visual | `docs/boceto-paso-a-paso.html`: se toma su comportamiento y estructura; sus colores **NO** (se usa Macaron) |
 | Librerías de UI aprobadas | motion, @number-flow/react, rough-notation, mafs, cmdk, sileo y componentes de React Bits (Count Up, Spotlight Card, Dot Grid) |
@@ -135,7 +135,8 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [ ] Presentación
 
 ### Plan de etapas siguientes
-- [ ] **4a** Interfaz: entrada del modelo + paso a paso (tablas, bitácora, colores Macaron)
+- [x] **4a-1** Entrada del modelo: parser (texto → modelo, errores por línea), verificación con javascript-lp-solver, pestañas Escribir/Tabla sincronizadas, vista previa KaTeX, 4 ejemplos, pantalla de resultado simple (estado, valores, Z, verificación, decimales/fracciones)
+- [ ] **4a-2** Paso a paso animado (tablas, bitácora, colores Macaron); reemplaza la pantalla de resultado simple
 - [ ] **4b** Método gráfico con Mafs
 - [ ] **5** Dual y sensibilidad
 - [ ] **6** Pulido: Ctrl + K (cmdk), avisos (sileo), Dot Grid, link compartible, README
