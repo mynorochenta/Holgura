@@ -117,7 +117,7 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [x] Nombre (Holgura), método (Gran M) y formato de números (decimales + botón a fracciones) confirmados
 - [x] Node.js y Git instalados
 - [x] Proyecto base creado (Vite + React + TS, Tailwind 4, Vitest; acento verde oscuro, fuentes IBM Plex vía @fontsource)
-- [ ] Repositorio creado
+- [x] Repositorio creado (https://github.com/mynorochenta/Holgura)
 - [ ] Deploy en Vercel
 - [ ] Simplex núcleo
 - [ ] Dual
