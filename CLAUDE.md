@@ -136,7 +136,7 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 
 ### Plan de etapas siguientes
 - [x] **4a-1** Entrada del modelo: parser (texto → modelo, errores por línea), verificación con javascript-lp-solver, pestañas Escribir/Tabla sincronizadas, vista previa KaTeX, 4 ejemplos, pantalla de resultado simple (estado, valores, Z, verificación, decimales/fracciones)
-- [ ] **4a-2** Paso a paso animado (tablas, bitácora, colores Macaron); reemplaza la pantalla de resultado simple
+- [x] **4a-2** Paso a paso animado: `core/steps.ts` (una operación por paso, cálculo de cada celda, textos), pantalla de solución con preparación, tabla animada (motion, NumberFlow, rough-notation), bitácora, Spotlight Card y Count Up de React Bits, tarjeta final; respeta prefers-reduced-motion
 - [ ] **4b** Método gráfico con Mafs
 - [ ] **5** Dual y sensibilidad
 - [ ] **6** Pulido: Ctrl + K (cmdk), avisos (sileo), Dot Grid, link compartible, README

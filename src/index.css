@@ -123,3 +123,26 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Tooltip con el cálculo de cada celda de la fila que cambia. */
+.tip[data-tip]:hover::after,
+.tip[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 6px;
+  z-index: 5;
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: var(--color-tinta);
+  color: var(--color-papel);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fade-up 0.15s ease both;
+}
+.tip:focus-visible {
+  outline: 2px solid var(--color-piv-acento);
+  outline-offset: -2px;
+}

@@ -5,7 +5,7 @@ import type { LinearModel } from './core/model'
 import { parseModel } from './core/parser'
 import { EXAMPLES, type Example } from './examples'
 import { InputPage, type InputTab } from './pages/InputPage'
-import { ResultPage } from './pages/ResultPage'
+import { SolutionPage } from './pages/SolutionPage'
 
 const FIRST_EXAMPLE = EXAMPLES[0]
 
@@ -49,7 +49,7 @@ function App() {
       <Header onHome={edit} />
       <main>
         {solvedModel ? (
-          <ResultPage model={solvedModel} format={format} onFormatChange={setFormat} onEdit={edit} />
+          <SolutionPage model={solvedModel} format={format} onFormatChange={setFormat} onEdit={edit} />
         ) : (
           <InputPage
             text={text}
