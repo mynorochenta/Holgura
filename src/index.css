@@ -5,20 +5,121 @@
 @import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
+@import 'katex/dist/katex.min.css';
 
-/* Paleta "cuaderno de ingeniería": fondo hueso, tinta casi negra, acento verde oscuro. */
+/*
+ * Paleta "Macaron": fondo crema, texto oscuro y pares pastel / acento por tipo de operación.
+ * El pastel va de fondo (fila que cambia, chip, operación activa); el acento solo en bordes,
+ * puntos y anillos. Todo el texto se mantiene en tono oscuro.
+ */
 @theme {
   --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --color-papel: #f7f4ec;
-  --color-tinta: #1c1b19;
-  --color-tinta-suave: #5c5a55;
-  --color-linea: #d9d4c7;
-  --color-acento: #1f4d3a;
-  --color-acento-suave: #e3ece6;
+  --color-papel: #fffdf9;
+  --color-hoja: #ffffff;
+  --color-tinta: #25232b;
+  --color-tinta-suave: #5e5a66;
+  --color-linea: #ebe6df;
+  --color-suave: #f6f2ec;
+
+  /* Selección (entra / sale) */
+  --color-sel: #c4f0dc;
+  --color-sel-acento: #4bb88c;
+  /* Pivote a 1 */
+  --color-piv: #cfe2ff;
+  --color-piv-acento: #5b8def;
+  /* Hacer cero */
+  --color-cero: #ffd9bf;
+  --color-cero-acento: #f0955a;
+  /* Fila Z */
+  --color-zeta: #e5d4ff;
+  --color-zeta-acento: #9b6fe0;
+  /* Errores del editor */
+  --color-error: #ffdbde;
+  --color-error-acento: #e0606c;
+
+  --shadow-hoja: 0 1px 2px rgb(60 50 90 / 0.04), 0 10px 30px -12px rgb(60 50 90 / 0.12);
 }
 
 body {
   @apply bg-papel text-tinta font-sans antialiased;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-linea bg-hoja shadow-hoja;
+  }
+
+  .kicker {
+    @apply text-xs font-medium tracking-[0.08em] text-tinta-suave uppercase;
+  }
+
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-linea bg-hoja px-3.5 py-2 text-sm font-medium text-tinta;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .btn:hover:not(:disabled) {
+    @apply border-tinta-suave shadow-hoja;
+    transform: translateY(-1px);
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+  .btn:focus-visible {
+    @apply outline-2 outline-offset-2 outline-piv-acento;
+  }
+  .btn-primary {
+    @apply border-tinta bg-tinta text-papel;
+  }
+  .btn-primary:hover:not(:disabled) {
+    @apply border-tinta;
+  }
+
+  .field {
+    @apply w-full rounded-md border border-linea bg-hoja px-2 py-1.5 text-right font-mono text-sm text-tinta;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field:hover {
+    @apply border-tinta-suave/50;
+  }
+  .field:focus {
+    @apply border-piv-acento outline-none;
+    box-shadow: 0 0 0 3px var(--color-piv);
+  }
+  .field[aria-invalid='true'] {
+    @apply border-error-acento bg-error;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
