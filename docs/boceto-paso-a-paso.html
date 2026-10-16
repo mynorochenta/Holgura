@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Holgura — boceto del paso a paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F4;--paper:#FFFFFF;--ink:#24232A;--muted:#7A7784;--line:#ECE8F0;--soft:#F4F1F7;
+  --acc:#2F8F6B;--acc-t:#DDF4EA;
+  --div:#4A72C9;--div-t:#E1EAFE;
+  --el:#C2762F;--el-t:#FFE7D3;
+  --z:#8A5CC7;--z-t:#EFE5FC;
+  --shadow:0 1px 2px rgba(60,50,90,.04),0 10px 30px -12px rgba(60,50,90,.12);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#17161C;--paper:#1F1E25;--ink:#EEEBF4;--muted:#A19DAD;--line:#2F2D38;--soft:#27252F;
+  --acc:#7FD8B2;--acc-t:#1E3A30;
+  --div:#9CB8F5;--div-t:#232D45;
+  --el:#F2B27A;--el-t:#3A2A1E;
+  --z:#C9A6F2;--z-t:#30264A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.5);
+}}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--line)}
+.brand{font-weight:600;letter-spacing:-.01em;font-size:18px;display:flex;align-items:center;gap:10px}
+.brand i{width:18px;height:18px;border:2px solid var(--acc);border-radius:3px;position:relative}
+.brand i::after{content:"";position:absolute;left:3px;right:3px;bottom:3px;height:5px;background:var(--acc);border-radius:1px}
+nav{display:flex;gap:22px;color:var(--muted);font-size:14px}
+nav span{cursor:pointer;transition:color .2s}
+nav span:hover,nav span.on{color:var(--ink)}
+main{max-width:1240px;margin:0 auto;padding:28px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px}
+.problem{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.problem .model{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--muted)}
+.problem .model b{color:var(--ink);font-weight:500}
+.seg{display:inline-flex;background:var(--soft);border-radius:8px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .2s}
+.seg button.on{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);position:relative;transition:border-color .3s}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),var(--t,var(--acc-t)),transparent 70%);mix-blend-mode:multiply}
+.card:hover::after{opacity:.55}
+@media (prefers-color-scheme:dark){.card::after{mix-blend-mode:screen}}
+.card>*{position:relative;z-index:1}
+.explain{padding:20px 22px 20px 26px;position:relative;overflow:hidden;margin-bottom:18px;min-height:132px}
+.explain::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);transition:background .35s}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.etitle{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:500;margin:4px 0 8px;color:var(--c);transition:color .35s}
+.ewhy{color:var(--ink);max-width:68ch}
+.fade{animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.tablewrap{padding:8px;overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-family:"IBM Plex Mono",monospace;font-size:15px}
+th{font-weight:500;color:var(--muted);font-size:13px;padding:12px 14px;text-align:right;border-bottom:1px solid var(--line);transition:background .3s,color .3s}
+th:first-child,td:first-child{text-align:left}
+td{padding:13px 14px;text-align:right;border-bottom:1px solid var(--soft);position:relative;transition:background .3s,box-shadow .3s}
+tr.zrow td{border-top:1.5px solid var(--ink);border-bottom:0}
+td.sol,th.sol{border-left:1px solid var(--line)}
+td.rat,th.rat{color:var(--muted);border-left:1px dashed var(--line);min-width:84px}
+tbody tr:hover td{background:var(--soft)}
+td.colhl,th.colhl{background:var(--acc-t)}
+tr.rowhl td{background:var(--acc-t)}
+td.pivot{box-shadow:inset 0 0 0 2px var(--acc);background:var(--paper)!important;font-weight:600;border-radius:6px}
+tr.target td{background:var(--t)}
+tr.target td:first-child{box-shadow:inset 3px 0 0 var(--c)}
+tr.source td{background:transparent}
+tr.source td:first-child{box-shadow:inset 3px 0 0 var(--line)}
+td.chg span{display:inline-block;animation:pop .55s cubic-bezier(.2,.8,.2,1) both;color:var(--c);font-weight:500}
+@keyframes pop{0%{opacity:0;transform:translateY(-10px)}60%{opacity:1}100%{transform:none}}
+td.basechg span{display:inline-block;animation:pop .55s both;color:var(--c);font-weight:600}
+td .old{position:absolute;right:14px;top:-1px;font-size:11px;color:var(--muted);text-decoration:line-through;opacity:.8}
+td.min{color:var(--acc);font-weight:600}
+[data-tip]{cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);right:6px;background:var(--ink);color:var(--paper);font-size:12px;padding:6px 9px;border-radius:6px;white-space:nowrap;z-index:5;animation:fade .15s}
+.controls{display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:14px;padding:8px 14px;border-radius:8px;cursor:pointer;transition:transform .15s,box-shadow .2s,border-color .2s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--shadow);border-color:var(--muted)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.count{margin-left:auto;font-size:13px;color:var(--muted)}
+.progress{display:flex;gap:3px;padding:0 16px 16px}
+.progress div{flex:1;height:4px;border-radius:2px;background:var(--soft);cursor:pointer;transition:background .3s,transform .15s}
+.progress div:hover{transform:scaleY(1.8)}
+.progress div.done{background:var(--muted)}
+.progress div.cur{background:var(--acc)}
+.result{display:none;margin-top:18px;padding:20px 22px;gap:28px;flex-wrap:wrap;align-items:baseline}
+.result.show{display:flex;animation:fade .5s}
+.result .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.result .v{font-family:"IBM Plex Mono",monospace;font-size:28px;font-weight:500}
+.result .v.big{color:var(--acc)}
+aside.card{align-self:start;position:sticky;top:20px}
+aside h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;margin:0;padding:16px 18px;border-bottom:1px solid var(--line)}
+.log{list-style:none;margin:0;padding:8px;max-height:560px;overflow:auto}
+.log .grp{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:12px 10px 4px}
+.log li.it{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .2s,opacity .3s,transform .2s}
+.log li.it:hover{background:var(--soft);transform:translateX(2px)}
+.log li.it.fut{opacity:.35}
+.log li.it.cur{background:var(--t)}
+.chip{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.log .lt{font-family:"IBM Plex Mono",monospace;font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:12px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+@media (max-width:900px){main{grid-template-columns:1fr;padding:16px}aside{position:static}nav{display:none}header{padding:14px 16px}.etitle{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><i></i>Holgura</div>
+  <nav><span class="on">Resolver</span><span>Ejemplos</span><span>Dual</span><span>Sensibilidad</span><span>Teoría</span></nav>
+</header>
+<main>
+  <div class="problem">
+    <div class="model"><b>Max Z = 40x₁ + 30x₂</b> &nbsp;s.a.&nbsp; 2x₁ + x₂ ≤ 40 · 3x₁ + 4x₂ ≤ 120 · x₁, x₂ ≥ 0</div>
+    <div class="seg" id="mode"><button data-m="dec" class="on">Decimales</button><button data-m="frac">Fracciones</button></div>
+  </div>
+  <section>
+    <div class="card explain" id="exp">
+      <div class="kicker" id="kick"></div>
+      <div class="etitle" id="etitle"></div>
+      <div class="ewhy" id="ewhy"></div>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table id="tab"></table></div>
+      <div class="controls">
+        <button class="btn" id="prev">← Anterior</button>
+        <button class="btn primary" id="next">Siguiente →</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="progress" id="prog"></div>
+    </div>
+    <div class="card result" id="res"></div>
+  </section>
+  <aside class="card">
+    <h3>Operaciones</h3>
+    <ul class="log" id="log"></ul>
+    <div class="legend">
+      <span><i class="chip" style="--c:var(--acc)"></i>Selección</span>
+      <span><i class="chip" style="--c:var(--div)"></i>Pivote a 1</span>
+      <span><i class="chip" style="--c:var(--el)"></i>Hacer cero</span>
+      <span><i class="chip" style="--c:var(--z)"></i>Fila Z</span>
+    </div>
+  </aside>
+</main>
+<script>
+const COLS=['x₁','x₂','S₁','S₂'];
+const RN=['R1','R2','Z'];
+let mode='dec';
+const fdec=v=>String(Math.round(v*1e4)/1e4).replace('-','−');
+function ffrac(v){if(Number.isInteger(v))return fdec(v);for(let d=2;d<=1000;d++){const n=Math.round(v*d);if(Math.abs(n/d-v)<1e-9)return(n<0?'−':'')+Math.abs(n)+'/'+d}return fdec(v)}
+const f=v=>mode==='dec'?fdec(v):ffrac(v);
+const p=v=>v<0?`(${f(v)})`:f(v);
+const clone=t=>({base:[...t.base],rows:t.rows.map(r=>[...r])});
+let T={base:['S₁','S₂','Z'],rows:[[2,1,1,0,40],[3,4,0,1,120],[-40,-30,0,0,0]]};
+const steps=[];
+const push=s=>steps.push({...s,table:clone(T)});
+
+function enter(iter,col,why){push({iter,kind:'enter',col,title:()=>`Entra ${COLS[col]}`,why})}
+function ratio(iter,col,row,why){
+  const ratios=T.rows.slice(0,2).map(r=>r[col]>0?r[4]/r[col]:null);
+  const leave=T.base[row];
+  push({iter,kind:'ratio',col,row,ratios,title:()=>`Sale ${leave}`,why});
+}
+function op(iter,type,target,src,k,col,why,newBase){
+  const prev=clone(T);
+  if(type==='div'){T.rows[target]=T.rows[target].map(v=>v/k);if(newBase)T.base[target]=newBase}
+  else T.rows[target]=T.rows[target].map((v,j)=>v-k*T.rows[src][j]);
+  T.rows[target]=T.rows[target].map(v=>Math.abs(v)<1e-9?0:Math.round(v*1e9)/1e9);
+  const kind=type==='div'?'div':(target===2?'z':'el');
+  const title=()=>type==='div'?`${RN[target]} ← ${RN[target]} ÷ ${f(k)}`:`${RN[target]} ← ${RN[target]} ${k>0?'−':'+'} ${f(Math.abs(k))}·${RN[src]}`;
+  push({iter,kind,type,target,src,k,col,prev,title,why,baseChanged:!!newBase});
+}
+
+push({iter:0,kind:'start',title:()=>'Tabla inicial',why:()=>'Cada restricción ≤ recibe una variable de holgura (S₁, S₂) que mide el recurso sin usar. La función objetivo se reescribe como Z − 40x₁ − 30x₂ = 0 y ocupa la última fila.'});
+enter(1,0,()=>`El valor más negativo de la fila Z es ${f(-40)}, en la columna x₁. Es la variable que más aumenta Z por cada unidad, así que entra a la base.`);
+ratio(1,0,0,()=>`Se divide la columna Solución entre los coeficientes positivos de x₁: 40 ÷ 2 = ${f(20)} y 120 ÷ 3 = ${f(40)}. La menor razón indica la restricción que se agota primero: sale S₁. El pivote es 2.`);
+op(1,'div',0,null,2,0,()=>'Se divide toda la fila entre el pivote para que quede en 1. x₁ reemplaza a S₁ en la base.','x₁');
+op(1,'el',1,0,3,0,()=>'Debajo del pivote debe haber un 0. R2 tiene 3 en la columna x₁, así que se le resta 3 veces la nueva R1.');
+op(1,'el',2,0,-40,0,()=>`La fila Z tiene ${f(-40)} en la columna x₁. Al sumarle 40 veces R1 queda en 0, y Z sube a 800.`);
+enter(2,1,()=>`Todavía hay un negativo en la fila Z: ${f(-10)} en x₂. La solución aún puede mejorar.`);
+ratio(2,1,1,()=>`Razones: 20 ÷ ${f(0.5)} = ${f(40)} y 60 ÷ ${f(2.5)} = ${f(24)}. La menor es ${f(24)}: sale S₂. El pivote es ${f(2.5)}.`);
+op(2,'div',1,null,2.5,1,()=>`Se divide R2 entre ${f(2.5)} para que el pivote sea 1. x₂ entra a la base en lugar de S₂.`,'x₂');
+op(2,'el',0,1,0.5,1,()=>`R1 tiene ${f(0.5)} en la columna x₂. Se le resta ${f(0.5)} veces R2 para dejarlo en 0.`);
+op(2,'el',2,1,-10,1,()=>`Se suma 10 veces R2 a la fila Z para eliminar el ${f(-10)}.`);
+push({iter:2,kind:'opt',title:()=>'Solución óptima',why:()=>'Ya no quedan valores negativos en la fila Z: ninguna variable puede mejorar el resultado.'});
+
+const colorOf=k=>({div:['--div','--div-t'],el:['--el','--el-t'],z:['--z','--z-t']}[k]||['--acc','--acc-t']);
+let cur=0;
+const $=id=>document.getElementById(id);
+
+function render(){
+  const s=steps[cur],t=s.table,[c,tt]=colorOf(s.kind);
+  const exp=$('exp');exp.style.setProperty('--c',`var(${c})`);
+  document.documentElement.style.setProperty('--c',`var(${c})`);document.documentElement.style.setProperty('--t',`var(${tt})`);
+  $('kick').textContent=s.iter?`Iteración ${s.iter}`:'Preparación';
+  $('etitle').textContent=s.title();$('ewhy').textContent=s.why();
+  for(const id of ['kick','etitle','ewhy']){const e=$(id);e.classList.remove('fade');void e.offsetWidth;e.classList.add('fade')}
+  const showRatio=s.kind==='ratio';
+  const colhl=(s.kind==='enter'||s.kind==='ratio')?s.col:-1;
+  let h='<thead><tr><th>Base</th>'+COLS.map((n,j)=>`<th class="${j===colhl?'colhl':''}">${n}</th>`).join('')+'<th class="sol">Solución</th>'+(showRatio?'<th class="rat">Razón</th>':'')+'</tr></thead><tbody>';
+  const minR=showRatio?Math.min(...s.ratios.filter(r=>r!==null)):null;
+  t.rows.forEach((r,i)=>{
+    let cls=i===2?'zrow':'';
+    if(s.kind==='ratio'&&i===s.row)cls+=' rowhl';
+    if(s.kind==='div'||s.kind==='el'||s.kind==='z'){if(i===s.target)cls+=' target';if(i===s.src)cls+=' source'}
+    const isT=(s.kind==='div'||s.kind==='el'||s.kind==='z')&&i===s.target;
+    h+=`<tr class="${cls}"><td class="${isT&&s.baseChanged?'basechg':''}"><span>${t.base[i]}</span></td>`;
+    r.forEach((v,j)=>{
+      let cc=j===4?'sol':'';let tip='';let old='';
+      if(j===colhl)cc+=' colhl';
+      if(s.kind==='ratio'&&i===s.row&&j===s.col)cc+=' pivot';
+      if(isT){cc+=' chg';const o=s.prev.rows[i][j];
+        tip=s.type==='div'?`${f(v)} = ${f(o)} ÷ ${f(s.k)}`:`${f(v)} = ${f(o)} − ${p(s.k)} × ${p(t.rows[s.src][j])}`;
+        if(Math.abs(o-v)>1e-9)old=`<span class="old">${f(o)}</span>`;}
+      h+=`<td class="${cc}" ${tip?`data-tip="${tip}"`:''} style="${isT?`--d:${j}`:''}">${old}<span style="animation-delay:${isT?j*60:0}ms">${f(v)}</span></td>`;
+    });
+    if(showRatio){const rv=i<2?s.ratios[i]:undefined;h+=`<td class="rat ${rv===minR&&i<2?'min':''}">${i===2?'':rv===null?'—':f(rv)}</td>`}
+    h+='</tr>';
+  });
+  $('tab').innerHTML=h+'</tbody>';
+  $('prev').disabled=cur===0;$('next').disabled=cur===steps.length-1;
+  $('count').textContent=`Paso ${cur+1} de ${steps.length}`;
+  $('prog').innerHTML=steps.map((_,i)=>`<div class="${i<cur?'done':i===cur?'cur':''}" data-i="${i}"></div>`).join('');
+  let lh='',lastIt=-1;
+  steps.forEach((st,i)=>{
+    if(st.iter!==lastIt){lh+=`<li class="grp">${st.iter?'Iteración '+st.iter:'Preparación'}</li>`;lastIt=st.iter}
+    const [cc,ct]=colorOf(st.kind);
+    lh+=`<li class="it ${i<cur?'':i===cur?'cur':'fut'}" data-i="${i}" style="--c:var(${cc});--t:var(${ct})"><i class="chip"></i><span class="lt">${st.title()}</span></li>`;
+  });
+  $('log').innerHTML=lh;
+  const res=$('res');
+  if(s.kind==='opt'){res.innerHTML=`<div><div class="k">x₁</div><div class="v" data-n="8">0</div></div><div><div class="k">x₂</div><div class="v" data-n="24">0</div></div><div><div class="k">Z máximo</div><div class="v big" data-n="1040">0</div></div><div><div class="k">Verificación</div><div class="v" style="font-size:15px;color:var(--acc)">✓ Coincide con un solver independiente</div></div>`;res.classList.add('show');res.querySelectorAll('[data-n]').forEach(countUp)}
+  else res.classList.remove('show');
+}
+function countUp(el){const n=+el.dataset.n,t0=performance.now(),d=900;const tick=now=>{const k=Math.min(1,(now-t0)/d),e=1-Math.pow(1-k,3);el.textContent=f(Math.round(n*e));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+document.addEventListener('pointermove',e=>{document.querySelectorAll('.card').forEach(c=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')})});
+const go=i=>{cur=Math.max(0,Math.min(steps.length-1,i));render()};
+$('next').onclick=()=>go(cur+1);$('prev').onclick=()=>go(cur-1);
+$('prog').onclick=e=>{const i=e.target.dataset.i;if(i!==undefined)go(+i)};
+$('log').onclick=e=>{const li=e.target.closest('[data-i]');if(li)go(+li.dataset.i)};
+$('mode').onclick=e=>{const m=e.target.dataset.m;if(!m)return;mode=m;[...$('mode').children].forEach(b=>b.classList.toggle('on',b.dataset.m===m));render()};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+render();
+</script>
+</body>
+</html>
