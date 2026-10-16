@@ -1,44 +1,17 @@
-import { useMemo } from 'react'
-import { ModelPreview } from '../components/ModelPreview'
-import { Segmented } from '../components/Segmented'
-import { formatNumber, type NumberFormat } from '../core/fraction'
-import type { LinearModel } from '../core/model'
-import { MAX_ITERATIONS, explainInfeasibility, solveSimplex, type SimplexResult } from '../core/simplex'
-import { verify, type Verification } from '../core/verify'
-
-interface ResultPageProps {
-  model: LinearModel
-  format: NumberFormat
-  onFormatChange: (format: NumberFormat) => void
-  onEdit: () => void
-}
-
-type Tone = 'sel' | 'cero' | 'error'
-
-const TONE_CLASS: Record<Tone, { bar: string; chip: string }> = {
-  sel: { bar: 'bg-sel-acento', chip: 'bg-sel' },
-  cero: { bar: 'bg-cero-acento', chip: 'bg-cero' },
-  error: { bar: 'bg-error-acento', chip: 'bg-error' },
-}
+import { motion, useReducedMotion } from 'motion/react'
+import { formatNumber, type Fraction, type NumberFormat } from '../core/fraction'
+import { MAX_ITERATIONS, explainInfeasibility, type SimplexResult } from '../core/simplex'
+import type { Verification } from '../core/verify'
+import CountUp from './reactbits/CountUp'
+import SpotlightCard from './reactbits/SpotlightCard'
+import { joinNames, subscript } from './text'
+import { TONE_CLASS, resultTone, type Tone } from './tone'
 
 interface StatusMessage {
   label: string
   title: string
   body: string
-  tone: Tone
   notes: string[]
-}
-
-const SUBSCRIPTS = '₀₁₂₃₄₅₆₇₈₉'
-
-/** x1 → x₁, S12 → S₁₂ */
-function subscript(name: string): string {
-  return name.replace(/\d/g, (d) => SUBSCRIPTS[Number(d)])
-}
-
-function joinNames(names: string[]): string {
-  const pretty = names.map(subscript)
-  return pretty.length === 1 ? pretty[0] : `${pretty.slice(0, -1).join(', ')} y ${pretty[pretty.length - 1]}`
 }
 
 function iterationsText(count: number): string {
@@ -57,11 +30,11 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
     case 'optimal': {
       const steps = `Se llegó en ${iterationsText(result.iterations.length)}.`
       if (multiple) {
+        const one = multiple.variables.length === 1
         return {
           label: 'Óptimo',
           title: 'Soluciones múltiples',
-          body: `Esta es una solución óptima, pero no la única: ${joinNames(multiple.variables)} no ${multiple.variables.length === 1 ? 'está' : 'están'} en la base y ${multiple.variables.length === 1 ? 'tiene' : 'tienen'} 0 en la fila Z, así que puede${multiple.variables.length === 1 ? '' : 'n'} entrar sin cambiar el valor de Z. ${steps}`,
-          tone: 'sel',
+          body: `Esta es una solución óptima, pero no la única: ${joinNames(multiple.variables)} no ${one ? 'está' : 'están'} en la base y ${one ? 'tiene' : 'tienen'} 0 en la fila Z, así que puede${one ? '' : 'n'} entrar sin cambiar el valor de Z. ${steps}`,
           notes: degeneracyNote ? [degeneracyNote] : [],
         }
       }
@@ -70,7 +43,6 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
           label: 'Óptimo',
           title: 'Solución óptima degenerada',
           body: `${degeneracyNote} El valor de Z es óptimo. ${steps}`,
-          tone: 'sel',
           notes: [],
         }
       }
@@ -78,7 +50,6 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
         label: 'Óptimo',
         title: 'Solución óptima',
         body: `Ya no quedan valores negativos en la fila Z: ninguna variable puede mejorar el resultado. ${steps}`,
-        tone: 'sel',
         notes: [],
       }
     }
@@ -88,8 +59,7 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
       return {
         label: 'Infactible',
         title: 'El problema no tiene solución factible',
-        body: `Las restricciones se contradicen: ningún punto las cumple todas a la vez.${detail ? ` Al terminar el método, ${detail}.` : ''}`,
-        tone: 'error',
+        body: `Las restricciones se contradicen: ningún punto las cumple todas a la vez.${detail ? ` Al terminar el método, ${subscript(detail)}.` : ''}`,
         notes: [],
       }
     }
@@ -100,7 +70,6 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
         label: 'No acotado',
         title: 'El problema no está acotado',
         body: `${name} puede crecer sin límite: su columna no tiene coeficientes positivos, así que ninguna restricción la detiene y Z mejora indefinidamente.`,
-        tone: 'cero',
         notes: [],
       }
     }
@@ -109,7 +78,6 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
         label: 'Sin terminar',
         title: `Se alcanzó el límite de ${MAX_ITERATIONS} iteraciones`,
         body: 'El método no llegó al óptimo dentro del límite. Puede deberse a un ciclo por degeneración.',
-        tone: 'cero',
         notes: [],
       }
   }
@@ -156,64 +124,56 @@ function VerificationLine({ verification }: { verification: Verification }) {
   )
 }
 
-function ValueTile({ name, value, emphasis = false }: { name: string; value: string; emphasis?: boolean }) {
+/** Valor que cuenta desde 0 (Count Up) en decimales; en fracciones, entra con una transición. */
+function CountedValue({ value, format }: { value: Fraction; format: NumberFormat }) {
+  const reduce = useReducedMotion()
+  const text = formatNumber(value, format)
+  if (format === 'fraction' || reduce) {
+    return (
+      <motion.span
+        key={text}
+        initial={reduce ? false : { opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduce ? 0 : 0.4 }}
+      >
+        {text}
+      </motion.span>
+    )
+  }
+  return <CountUp key={text} to={Number(value.valueOf().toFixed(4))} duration={1} />
+}
+
+function ValueTile({
+  name,
+  value,
+  format,
+  emphasis = false,
+}: {
+  name: string
+  value: Fraction
+  format: NumberFormat
+  emphasis?: boolean
+}) {
   return (
     <div className={emphasis ? 'rounded-xl bg-sel/60 px-4 py-3 ring-1 ring-sel-acento/50' : 'px-1 py-3'}>
       <div className="kicker normal-case">{name}</div>
-      <div className={`mt-0.5 font-mono font-medium tabular-nums ${emphasis ? 'text-3xl' : 'text-2xl'}`}>{value}</div>
-    </div>
-  )
-}
-
-export function ResultPage({ model, format, onFormatChange, onEdit }: ResultPageProps) {
-  const outcome = useMemo(() => {
-    try {
-      const result = solveSimplex(model)
-      return { result, verification: verify(model, result), error: null }
-    } catch (error) {
-      return { result: null, verification: null, error: (error as Error).message }
-    }
-  }, [model])
-
-  return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-7 sm:py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <button type="button" className="btn" onClick={onEdit}>
-          ← Editar problema
-        </button>
-        <Segmented
-          label="Formato de los números"
-          value={format}
-          onChange={onFormatChange}
-          options={[
-            { value: 'decimal', label: 'Decimales' },
-            { value: 'fraction', label: 'Fracciones' },
-          ]}
-        />
+      <div className={`mt-0.5 font-mono font-medium tabular-nums ${emphasis ? 'text-3xl' : 'text-2xl'}`}>
+        <CountedValue value={value} format={format} />
       </div>
-
-      <section className="card mt-5 p-4 sm:p-5" aria-labelledby="modelo">
-        <h2 id="modelo" className="kicker">
-          Modelo
-        </h2>
-        <ModelPreview model={model} className="mt-1 text-[15px]" />
-      </section>
-
-      {outcome.error !== null && (
-        <section className="card mt-5 p-5">
-          <p className="font-medium">No se pudo resolver el modelo</p>
-          <p className="mt-1 text-sm text-tinta-suave">{outcome.error}</p>
-        </section>
-      )}
-
-      {outcome.result && outcome.verification && (
-        <ResultCard result={outcome.result} verification={outcome.verification} format={format} />
-      )}
     </div>
   )
 }
 
-function ResultCard({
+const TONE_BAR: Record<Tone, string> = {
+  sel: 'bg-sel-acento',
+  piv: 'bg-piv-acento',
+  cero: 'bg-cero-acento',
+  zeta: 'bg-zeta-acento',
+  error: 'bg-error-acento',
+}
+
+/** Tarjeta final: estado, valores, Z, holguras y verificación con el solver. */
+export function ResultSummary({
   result,
   verification,
   format,
@@ -223,17 +183,17 @@ function ResultCard({
   format: NumberFormat
 }) {
   const status = describeStatus(result, format)
-  const tone = TONE_CLASS[status.tone]
+  const tone = resultTone(result)
   const variables = result.finalTableau.variables
   const decision = variables.filter((_, j) => result.finalTableau.kinds[j] === 'decision')
   const auxiliary = variables.filter((_, j) => ['slack', 'surplus'].includes(result.finalTableau.kinds[j]))
   const solved = result.status === 'optimal'
 
   return (
-    <section className="card fade-up relative mt-5 overflow-hidden" aria-live="polite">
-      <span className={`absolute inset-y-0 left-0 w-1 ${tone.bar}`} />
-      <div className="p-5 pl-6 sm:p-6 sm:pl-7">
-        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${tone.chip}`}>
+    <SpotlightCard className="overflow-hidden" aria-live="polite">
+      <span className={`absolute inset-y-0 left-0 w-1 ${TONE_BAR[tone]}`} />
+      <div className="relative p-5 pl-6 sm:p-6 sm:pl-7">
+        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${TONE_CLASS[tone].pastel}`}>
           {status.label}
         </span>
         <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{status.title}</h2>
@@ -250,12 +210,13 @@ function ResultCard({
               <div className="col-span-2 sm:col-span-1">
                 <ValueTile
                   name={result.sense === 'max' ? 'Z máximo' : 'Z mínimo'}
-                  value={formatNumber(result.z, format)}
+                  value={result.z}
+                  format={format}
                   emphasis
                 />
               </div>
               {decision.map((name) => (
-                <ValueTile key={name} name={subscript(name)} value={formatNumber(result.values[name], format)} />
+                <ValueTile key={name} name={subscript(name)} value={result.values[name]} format={format} />
               ))}
             </div>
 
@@ -279,6 +240,6 @@ function ResultCard({
           <VerificationLine verification={verification} />
         </div>
       </div>
-    </section>
+    </SpotlightCard>
   )
 }
