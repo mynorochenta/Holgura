@@ -120,7 +120,8 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [x] Proyecto base creado (Vite + React + TS, Tailwind 4, Vitest; acento verde oscuro, fuentes IBM Plex vía @fontsource)
 - [x] Repositorio creado (https://github.com/mynorochenta/Holgura)
 - [x] Deploy en Vercel (https://holgura-pink.vercel.app)
-- [ ] Simplex núcleo
+- [x] Simplex núcleo (max, ≤)
+- [ ] Simplex: minimizar, ≥ y = (Gran M)
 - [ ] Dual
 - [ ] Sensibilidad
 - [ ] Interfaz
