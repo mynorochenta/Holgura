@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* Paleta "cuaderno de ingeniería": fondo hueso, tinta casi negra, acento verde oscuro. */
+@theme {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-papel: #f7f4ec;
+  --color-tinta: #1c1b19;
+  --color-tinta-suave: #5c5a55;
+  --color-linea: #d9d4c7;
+  --color-acento: #1f4d3a;
+  --color-acento-suave: #e3ece6;
+}
+
+body {
+  @apply bg-papel text-tinta font-sans antialiased;
+}
