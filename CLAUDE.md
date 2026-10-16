@@ -33,7 +33,7 @@
 | Método para ≥ y = | **Gran M** (es el que se ve en clase). Dos Fases NO se implementa |
 | Formato de tabla (igual al de clase) | Columnas: `Base | x₁ … xₙ | S/e/A | Solución (RHS)` y columna extra de razón. Fila **Z al final** de la tabla, escrita como `Z − c₁x₁ − c₂x₂ = 0` (coeficientes con signo cambiado). Entra la variable **más negativa** de la fila Z; sale la de **razón mínima** (RHS ÷ coeficiente positivo). Óptimo cuando no quedan negativos en Z |
 | Notación de variables | Holgura **Sᵢ** (≤), exceso **eᵢ** (≥, se resta), artificial **Aᵢ** (≥ y =, se suma con M) |
-| Explicación por iteración | Igual que en clase: "Se divide el renglón entre 2 para que el pivote sea 1"; "Se multiplica R1 por −3 y se suma a R2 → R′2" |
+| Explicación por iteración | Con las operaciones de renglón estándar: "Se divide R1 entre 2 para que el pivote sea 1"; "R2 ← R2 − 3·R1". Sin referencias a la clase |
 | Números (CONFIRMADO) | **Decimales por defecto** (como en las diapositivas), con un botón para cambiar a fracciones. Internamente todo se calcula con fracciones exactas (fraction.js) para no acumular errores de redondeo |
 | Flujo de trabajo | Claude (chat del proyecto) redacta los prompts; Mynor los pega en Claude Code, que crea y prueba los archivos. Este archivo vive en el repo como `CLAUDE.md` |
 | Alcance base (CONFIRMADO) | Simplex completo (maximizar/minimizar, ≤ ≥ =, Gran M) + Dual + Sensibilidad y precios sombra (salen de la tabla final) |
@@ -59,6 +59,7 @@
 12. **Exportar a PDF** la solución paso a paso.
 
 ## 5. Guía de diseño (que no parezca hecho con IA)
+- La interfaz es un producto profesional para portafolio, en español. Nunca menciona clase, curso, catedrático, universidad ni proyecto final. Los textos explican el método de forma general (como un libro o una herramienta profesional), no "como en clase".
 - Estética de "cuaderno de ingeniería": fondo hueso/blanco, tinta casi negra, un solo color de acento (por ejemplo azul tinta o verde oscuro).
 - Tipografía: una sans sobria para texto (Inter, IBM Plex Sans) + monoespaciada para tablas y números (IBM Plex Mono, JetBrains Mono).
 - **Evitar:** degradados morados, emojis en la interfaz, tarjetas con brillo, "hero" genérico tipo "Revolutionize your optimization 🚀", textos en inglés de relleno.
@@ -118,7 +119,7 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [x] Node.js y Git instalados
 - [x] Proyecto base creado (Vite + React + TS, Tailwind 4, Vitest; acento verde oscuro, fuentes IBM Plex vía @fontsource)
 - [x] Repositorio creado (https://github.com/mynorochenta/Holgura)
-- [ ] Deploy en Vercel
+- [x] Deploy en Vercel (https://holgura-pink.vercel.app)
 - [ ] Simplex núcleo
 - [ ] Dual
 - [ ] Sensibilidad
