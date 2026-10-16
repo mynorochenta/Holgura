@@ -139,33 +139,21 @@ describe('d) Soluciones múltiples: Máx Z = 2x1 + 4x2; x1 + 2x2 ≤ 5; x1 + x2 
   })
 })
 
-describe('e) Casos aún no soportados', () => {
-  const base: LinearModel = {
-    sense: 'max',
-    objective: [1, 1],
-    constraints: [{ coefficients: [1, 1], operator: '<=', rhs: 4 }],
-  }
-
-  it('minimizar', () => {
-    expect(() => solveSimplex({ ...base, sense: 'min' })).toThrow('Aún no soportado')
+describe('Modelo mal formado', () => {
+  it('rechaza una restricción con un número distinto de coeficientes', () => {
+    expect(() =>
+      solveSimplex({
+        sense: 'max',
+        objective: [1, 1],
+        constraints: [{ coefficients: [1, 1, 1], operator: '<=', rhs: 4 }],
+      }),
+    ).toThrow('La restricción 1 tiene 3 coeficientes y se esperaban 2.')
   })
 
-  it('restricción ≥', () => {
-    expect(() =>
-      solveSimplex({ ...base, constraints: [{ coefficients: [1, 1], operator: '>=', rhs: 4 }] }),
-    ).toThrow('Aún no soportado')
-  })
-
-  it('restricción =', () => {
-    expect(() =>
-      solveSimplex({ ...base, constraints: [{ coefficients: [1, 1], operator: '=', rhs: 4 }] }),
-    ).toThrow('Aún no soportado')
-  })
-
-  it('lado derecho negativo', () => {
-    expect(() =>
-      solveSimplex({ ...base, constraints: [{ coefficients: [1, 1], operator: '<=', rhs: -4 }] }),
-    ).toThrow('Aún no soportado')
+  it('rechaza una función objetivo sin variables', () => {
+    expect(() => solveSimplex({ sense: 'max', objective: [], constraints: [] })).toThrow(
+      'La función objetivo no tiene variables.',
+    )
   })
 })
 

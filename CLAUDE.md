@@ -121,7 +121,7 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [x] Repositorio creado (https://github.com/mynorochenta/Holgura)
 - [x] Deploy en Vercel (https://holgura-pink.vercel.app)
 - [x] Simplex núcleo (max, ≤)
-- [ ] Simplex: minimizar, ≥ y = (Gran M)
+- [x] Simplex: minimizar, ≥ y = (Gran M)
 - [ ] Dual
 - [ ] Sensibilidad
 - [ ] Interfaz
