@@ -53,5 +53,5 @@ export function ModelPreview({ model, className = '' }: ModelPreviewProps) {
     () => katex.renderToString(modelToLatex(model), { displayMode: true, throwOnError: false, output: 'html' }),
     [model],
   )
-  return <div className={`overflow-x-auto text-tinta ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
+  return <div className={`overflow-x-auto text-ink ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
 }

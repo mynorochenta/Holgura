@@ -1,12 +1,10 @@
 import { useReducedMotion } from 'motion/react'
-import { useEffect, useRef } from 'react'
-import type { Step, StepText } from '../core/steps'
-import SpotlightCard from './reactbits/SpotlightCard'
-import { prettyText } from './text'
-import { LEGEND, TONE_CLASS, type Tone } from './tone'
+import { useEffect, useRef, type CSSProperties } from 'react'
+import type { StepText } from '../core/steps'
+import { MathText } from './MathText'
+import { LEGEND, toneVars, type Tone } from './tone'
 
 interface OperationLogProps {
-  steps: Step[]
   texts: StepText[]
   tones: Tone[]
   current: number
@@ -14,7 +12,7 @@ interface OperationLogProps {
 }
 
 /** Bitácora de operaciones agrupada por iteración; cada renglón lleva a su paso. */
-export function OperationLog({ steps, texts, tones, current, onGo }: OperationLogProps) {
+export function OperationLog({ texts, tones, current, onGo }: OperationLogProps) {
   const reduce = useReducedMotion()
   const list = useRef<HTMLOListElement>(null)
 
@@ -31,44 +29,41 @@ export function OperationLog({ steps, texts, tones, current, onGo }: OperationLo
   }, [current, reduce])
 
   return (
-    <SpotlightCard className="overflow-hidden">
-      <div className="relative">
-        <h2 className="kicker border-b border-linea px-[18px] py-4">Operaciones</h2>
-        <ol ref={list} className="relative max-h-[420px] overflow-y-auto p-2 lg:max-h-[560px]">
-          {steps.map((step, i) => {
-            const newGroup = i === 0 || texts[i - 1].kicker !== texts[i].kicker
-            const state = i < current ? 'done' : i === current ? 'current' : 'future'
-            return (
-              <li key={step.index}>
-                {newGroup && (
-                  <div className="px-2.5 pt-3 pb-1 text-[11px] font-medium tracking-[0.08em] text-tinta-suave uppercase">
-                    {texts[i].kicker}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => onGo(i)}
-                  aria-current={state === 'current' ? 'step' : undefined}
-                  className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-[background-color,opacity,transform] duration-200 hover:translate-x-0.5 ${
-                    state === 'current' ? TONE_CLASS[tones[i]].pastel : 'hover:bg-suave'
-                  } ${state === 'future' ? 'opacity-40 hover:opacity-80' : ''}`}
-                >
-                  <span className={`size-2 shrink-0 rounded-full ${TONE_CLASS[tones[i]].dot}`} />
-                  <span className="font-mono text-[13px]">{prettyText(texts[i].title)}</span>
-                </button>
-              </li>
-            )
-          })}
-        </ol>
-        <div className="flex flex-wrap gap-x-3.5 gap-y-1.5 border-t border-linea px-[18px] py-3 text-xs text-tinta-suave">
-          {LEGEND.map(({ tone, label }) => (
-            <span key={tone} className="flex items-center gap-1.5">
-              <span className={`size-2 rounded-full ${TONE_CLASS[tone].dot}`} />
-              {label}
-            </span>
-          ))}
-        </div>
+    <section aria-labelledby="bitacora">
+      <h3 id="bitacora" className="kicker mb-2">
+        Operaciones
+      </h3>
+      <ol ref={list} className="op-log relative max-h-[380px] overflow-y-auto lg:max-h-[520px]">
+        {texts.map((text, i) => {
+          const newGroup = i === 0 || texts[i - 1].kicker !== text.kicker
+          const state = i < current ? 'done' : i === current ? 'current' : 'future'
+          return (
+            <li key={i}>
+              {newGroup && <div className="op-group">{text.kicker}</div>}
+              <button
+                type="button"
+                onClick={() => onGo(i)}
+                aria-current={state === 'current' ? 'step' : undefined}
+                className={`op-item ${state}`}
+                style={{ '--a': toneVars(tones[i]).accent } as CSSProperties}
+              >
+                <span className="op-number">{i + 1}</span>
+                <span>
+                  <MathText text={text.title} />
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ol>
+      <div className="mt-3 flex flex-wrap gap-x-3.5 gap-y-1 border-t border-rule pt-2.5 text-[11px] text-muted">
+        {LEGEND.map(({ tone, label }) => (
+          <span key={tone} className="flex items-center gap-1.5">
+            <span className="h-2.5 w-[3px]" style={{ background: toneVars(tone).accent }} />
+            {label}
+          </span>
+        ))}
       </div>
-    </SpotlightCard>
+    </section>
   )
 }

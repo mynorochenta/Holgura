@@ -3,6 +3,7 @@ import { Fraction } from '../core/fraction'
 import type { LinearModel, Operator, Sense } from '../core/model'
 import { modelToText, parseNumber, toInputText } from '../core/parser'
 import { Segmented } from './Segmented'
+import { Var } from './MathText'
 
 interface TableEditorProps {
   /** Modelo con el que arranca la tabla. */
@@ -69,11 +70,11 @@ interface StepperProps {
 
 function Stepper({ label, value, min, max, onChange }: StepperProps) {
   const buttonClass =
-    'size-8 cursor-pointer rounded-md text-base text-tinta-suave transition-all duration-150 hover:bg-hoja hover:text-tinta hover:shadow-hoja active:scale-90 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none'
+    'size-7 cursor-pointer text-base text-muted transition-colors duration-150 hover:text-ink active:scale-90 disabled:cursor-not-allowed disabled:opacity-30'
   return (
     <div className="flex items-center gap-2.5">
-      <span className="text-sm text-tinta-suave">{label}</span>
-      <div className="inline-flex items-center rounded-lg bg-suave p-[3px]">
+      <span className="text-[13px] text-muted">{label}</span>
+      <div className="inline-flex items-center border border-line bg-paper">
         <button
           type="button"
           className={buttonClass}
@@ -83,7 +84,7 @@ function Stepper({ label, value, min, max, onChange }: StepperProps) {
         >
           −
         </button>
-        <span className="w-7 text-center font-mono text-sm tabular-nums">{value}</span>
+        <span className="w-6 text-center font-display text-[15px]">{value}</span>
         <button
           type="button"
           className={buttonClass}
@@ -158,27 +159,27 @@ export function TableEditor({ initialModel, onChange }: TableEditorProps) {
         <Stepper label="Restricciones" value={m} min={1} max={MAX_CONSTRAINTS} onChange={setConstraints} />
       </div>
 
-      <div className="mt-5 overflow-x-auto rounded-xl border border-linea">
+      <div className="mt-5 overflow-x-auto border-y-[1.5px] border-ink bg-paper">
         <table className="w-full border-separate border-spacing-0 font-mono text-sm">
           <thead>
-            <tr className="text-[13px] text-tinta-suave">
-              <th className="sticky left-0 bg-suave px-3 py-2.5 text-left font-medium" />
+            <tr className="font-display text-[15px] text-ink">
+              <th className="sticky left-0 border-b border-line bg-paper px-3 py-2.5 text-left font-normal" />
               {variables.map((j) => (
-                <th key={j} className="bg-suave px-2 py-2.5 text-right font-medium">
-                  x<sub>{j + 1}</sub>
+                <th key={j} className="border-b border-line px-2 py-2.5 text-right font-normal">
+                  <Var name={`x${j + 1}`} />
                 </th>
               ))}
-              <th className="bg-suave px-2 py-2.5 text-center font-medium">Signo</th>
-              <th className="bg-suave px-3 py-2.5 text-right font-medium whitespace-nowrap">Lado derecho</th>
+              <th className="border-b border-line px-2 py-2.5 text-center font-sans text-[13px] font-normal text-muted">Signo</th>
+              <th className="border-b border-line px-3 py-2.5 text-right font-sans text-[13px] font-normal whitespace-nowrap text-muted">Lado derecho</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th className="sticky left-0 border-b border-linea bg-zeta/50 px-3 py-2 text-left font-medium whitespace-nowrap">
-                Z
+              <th className="sticky left-0 border-b border-line bg-zeta-t px-3 py-2 text-left font-display font-normal whitespace-nowrap">
+                <Var name="Z" />
               </th>
               {variables.map((j) => (
-                <td key={j} className="border-b border-linea bg-zeta/25 px-1.5 py-2">
+                <td key={j} className="border-b border-line bg-zeta-t/45 px-1.5 py-2">
                   <input
                     className="field min-w-16"
                     value={draft.objective[j]}
@@ -188,11 +189,11 @@ export function TableEditor({ initialModel, onChange }: TableEditorProps) {
                   />
                 </td>
               ))}
-              <td className="border-b border-linea bg-zeta/25" colSpan={2} />
+              <td className="border-b border-line bg-zeta-t/45" colSpan={2} />
             </tr>
             {draft.constraints.map((constraint, i) => (
-              <tr key={i} className="transition-colors duration-150 hover:bg-suave/60">
-                <th className="sticky left-0 bg-hoja px-3 py-2 text-left font-medium text-tinta-suave">R{i + 1}</th>
+              <tr key={i} className="transition-colors duration-150 hover:bg-rule/50">
+                <th className="sticky left-0 bg-paper px-3 py-2 text-left font-display font-normal text-muted">R{i + 1}</th>
                 {variables.map((j) => (
                   <td key={j} className="px-1.5 py-1.5">
                     <input
@@ -232,7 +233,7 @@ export function TableEditor({ initialModel, onChange }: TableEditorProps) {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-sm text-tinta-suave">
+      <p className="mt-3 text-[13px] text-muted">
         Todas las variables son no negativas. Acepta decimales (1.5), fracciones (3/2) y negativos; una celda vacía
         vale 0.
       </p>

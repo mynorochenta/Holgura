@@ -5,10 +5,10 @@ interface SegmentedProps<T extends string> {
   label: string
 }
 
-/** Control segmentado: pestañas, Max/Min, Decimales/Fracciones. */
+/** Opciones excluyentes (pestañas, Max/Min): texto plano, la activa subrayada con tinta. */
 export function Segmented<T extends string>({ options, value, onChange, label }: SegmentedProps<T>) {
   return (
-    <div role="tablist" aria-label={label} className="inline-flex rounded-lg bg-suave p-[3px]">
+    <div role="tablist" aria-label={label} className="inline-flex gap-4">
       {options.map((option) => {
         const active = option.value === value
         return (
@@ -18,8 +18,8 @@ export function Segmented<T extends string>({ options, value, onChange, label }:
             role="tab"
             aria-selected={active}
             onClick={() => onChange(option.value)}
-            className={`cursor-pointer rounded-md px-3 py-1.5 text-[13px] transition-all duration-200 active:scale-[0.97] ${
-              active ? 'bg-hoja text-tinta shadow-hoja' : 'text-tinta-suave hover:text-tinta'
+            className={`cursor-pointer border-b-[1.5px] pb-1 text-[13px] transition-colors duration-200 ${
+              active ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
             }`}
           >
             {option.label}

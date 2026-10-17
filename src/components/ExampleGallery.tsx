@@ -1,4 +1,5 @@
 import { EXAMPLES, type Example } from '../examples'
+import { MathText } from './MathText'
 
 interface ExampleGalleryProps {
   activeId: string | null
@@ -9,37 +10,34 @@ interface ExampleGalleryProps {
 export function ExampleGallery({ activeId, onSelect }: ExampleGalleryProps) {
   return (
     <section aria-labelledby="ejemplos">
-      <h2 id="ejemplos" className="kicker">
+      <h3 id="ejemplos" className="kicker mb-1">
         Ejemplos
-      </h2>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+      </h3>
+      <ul className="border-t border-rule">
         {EXAMPLES.map((example) => {
           const active = example.id === activeId
           return (
-            <button
-              key={example.id}
-              type="button"
-              onClick={() => onSelect(example)}
-              aria-pressed={active}
-              className={`group card cursor-pointer p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-tinta-suave/40 active:scale-[0.99] ${
-                active ? 'border-sel-acento ring-1 ring-sel-acento' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-medium">{example.title}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 font-mono text-[11px] whitespace-nowrap ${
-                    active ? 'bg-sel' : 'bg-suave'
-                  }`}
-                >
-                  {example.tag}
+            <li key={example.id} className="border-b border-rule">
+              <button
+                type="button"
+                onClick={() => onSelect(example)}
+                aria-pressed={active}
+                className={`group w-full cursor-pointer border-l-2 py-2.5 pr-1 pl-3 text-left transition-[border-color,padding] duration-200 hover:pl-4 ${
+                  active ? 'border-sel' : 'border-transparent'
+                }`}
+              >
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-[16px]">{example.title}</span>
+                  <span className="text-[11px] whitespace-nowrap text-muted">{example.tag}</span>
                 </span>
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-tinta-suave">{example.description}</p>
-            </button>
+                <span className="mt-0.5 block text-[13px] leading-snug text-muted">
+                  <MathText text={example.description} />
+                </span>
+              </button>
+            </li>
           )
         })}
-      </div>
+      </ul>
     </section>
   )
 }

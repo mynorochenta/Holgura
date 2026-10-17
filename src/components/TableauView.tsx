@@ -1,33 +1,37 @@
-import { motion, useReducedMotion } from 'motion/react'
-import { useRef, type CSSProperties } from 'react'
+import { animate } from 'motion/react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { MValue, formatMValue, formatNumber, type NumberFormat } from '../core/fraction'
 import type { SimplexResult } from '../core/simplex'
-import { formatCalculation, type CellCalculation, type Step } from '../core/steps'
+import type { CellCalculation, Step, StepRow } from '../core/steps'
 import { useRoughAnnotations } from '../hooks/useRoughAnnotations'
 import { AnimatedValue } from './AnimatedValue'
+import { Var } from './MathText'
 import { subscript } from './text'
-import { TONE_COLORS, TRANSPARENT, type Tone } from './tone'
+import { toneStyle, toneVars, type Tone } from './tone'
 
 interface TableauViewProps {
   step: Step
   result: SimplexResult
   format: NumberFormat
   tone: Tone
+  /** Movimiento con significado: solo al avanzar un paso hacia adelante. */
+  meaningfulMotion: boolean
+  /** Animar números y trazos (no al arrastrar la línea de tiempo). */
+  animateValues: boolean
+  /** Cambia con el tema, para redibujar los trazos a mano con los colores nuevos. */
+  theme: string
+  onHoverColumn: (column: number | null) => void
 }
 
 /** Qué se resalta en la tabla en este paso. */
 interface Highlights {
-  /** Columnas pintadas de arriba abajo. */
   columns: Set<number>
   columnTone: Tone
-  /** Filas pintadas (índice de restricción o 'Z'). */
-  rows: Map<number | 'Z', Tone>
+  rows: Map<StepRow, Tone>
   pivot: { row: number; column: number } | null
-  /** Anotaciones a mano. */
   underlineColumn: number | null
   boxRows: Set<number>
   circlePivot: boolean
-  roughTone: Tone
 }
 
 function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlights {
@@ -39,7 +43,6 @@ function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlight
     underlineColumn: null,
     boxRows: new Set(),
     circlePivot: false,
-    roughTone: tone,
   }
   const t = step.tableau
   switch (step.kind) {
@@ -86,121 +89,223 @@ function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlight
   return h
 }
 
-const CELL = 'relative px-3.5 pt-4 pb-3 whitespace-nowrap sm:px-4'
-const HEAD = 'px-3.5 py-3 text-[13px] font-medium whitespace-nowrap text-tinta-suave sm:px-4'
+/** HTML de una variable para las piezas que viajan (fuera del árbol de React). */
+function varHTML(name: string): string {
+  const match = /^([A-Za-z])(\d*)$/.exec(name)
+  if (!match) return name
+  return `<span class="mv">${match[1]}</span>${match[2] ? `<sub>${match[2]}</sub>` : ''}`
+}
 
-export function TableauView({ step, result, format, tone }: TableauViewProps) {
-  const reduce = useReducedMotion()
+const EASE_OUT: [number, number, number, number] = [0.3, 0.7, 0.2, 1]
+/** El "hacer cero" muestra los números nuevos cuando la franja llega a la fila. */
+const BAND_MS = 520
+const REVEAL_MS = 400
+
+export function TableauView({
+  step,
+  result,
+  format,
+  tone,
+  meaningfulMotion,
+  animateValues,
+  theme,
+  onHoverColumn,
+}: TableauViewProps) {
   const container = useRef<HTMLDivElement>(null)
-  const layer = useRef<HTMLDivElement>(null)
-  useRoughAnnotations(container, layer, `${step.index}-${format}`, !reduce)
+  const roughLayer = useRef<HTMLDivElement>(null)
+  const motionLayer = useRef<HTMLDivElement>(null)
+  useRoughAnnotations(container, roughLayer, `${step.index}-${format}-${theme}`, animateValues)
 
   const t = step.tableau
   const n = t.variables.length
   const h = highlightsFor(step, result, tone)
-  const roughColor = TONE_COLORS[h.roughTone].acento
   const showRatios = step.ratios !== undefined
   const calculations = new Map<number, CellCalculation>((step.calculations ?? []).map((c) => [c.column, c]))
-  const colorTransition = { duration: reduce ? 0 : 0.4, ease: 'easeOut' } as const
+  const isElimination = step.kind === 'eliminate' || step.kind === 'objective'
 
-  const cellBackground = (row: number | 'Z', column: number | null): string => {
-    const rowTone = h.rows.get(row)
-    if (rowTone) return TONE_COLORS[rowTone].pastel
-    if (column !== null && h.columns.has(column)) return TONE_COLORS[h.columnTone].pastel
-    return TRANSPARENT
-  }
+  // En "hacer cero" hacia adelante, la fila conserva sus valores viejos mientras baja la franja.
+  const delayReveal = meaningfulMotion && isElimination
+  const [revealed, setRevealed] = useState(-1)
+  const showPrevious = delayReveal && revealed !== step.index
+  useEffect(() => {
+    if (!delayReveal) return
+    const timer = setTimeout(() => setRevealed(step.index), REVEAL_MS)
+    return () => clearTimeout(timer)
+  }, [delayReveal, step.index])
 
-  const renderRow = (row: number | 'Z') => {
+  // Movimiento con significado: piezas temporales en una capa que React deja vacía.
+  useLayoutEffect(() => {
+    const root = container.current
+    const layer = motionLayer.current
+    if (!meaningfulMotion || !root || !layer) return
+    const origin = root.getBoundingClientRect()
+    const rel = (el: Element) => {
+      const r = el.getBoundingClientRect()
+      return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height }
+    }
+    const pieces: HTMLElement[] = []
+    const controls: { stop: () => void }[] = []
+    let hidden: HTMLElement | null = null
+
+    if (step.kind === 'scale' && step.basisChanged && step.enteringColumn !== undefined) {
+      // La variable que entra viaja del encabezado de su columna a la columna Base; la que sale se va.
+      const row = step.changedRow as number
+      const header = root.querySelector(`[data-head="${step.enteringColumn}"] [data-name]`)
+      const basisName = root.querySelector<HTMLElement>(`[data-row="${row}"] [data-basis]`)
+      if (header && basisName) {
+        const from = rel(header)
+        const to = rel(basisName)
+        const oldName = step.previous.variables[step.previous.basis[row]]
+
+        const ghost = document.createElement('div')
+        ghost.className = 'motion-piece text-muted'
+        ghost.innerHTML = varHTML(oldName)
+        Object.assign(ghost.style, { left: `${to.x}px`, top: `${to.y}px` })
+        layer.appendChild(ghost)
+        pieces.push(ghost)
+        const fade = animate(ghost, { x: [0, -28], opacity: [1, 0] }, { duration: 0.42, ease: 'easeIn' })
+        controls.push(fade)
+        fade.then(() => ghost.remove())
+
+        const fly = document.createElement('div')
+        fly.className = 'motion-piece text-[var(--c-ink)]'
+        fly.innerHTML = varHTML(t.variables[step.enteringColumn])
+        Object.assign(fly.style, { left: `${from.x}px`, top: `${from.y}px` })
+        layer.appendChild(fly)
+        pieces.push(fly)
+        hidden = basisName
+        basisName.style.opacity = '0'
+        const dx = to.x - from.x
+        const dy = to.y - from.y
+        const flight = animate(
+          fly,
+          { x: [0, dx * 0.5, dx], y: [0, dy * 0.5 - 26, dy], scale: [1, 1.15, 1] },
+          { duration: 0.65, delay: 0.12, ease: EASE_OUT },
+        )
+        controls.push(flight)
+        flight.then(() => {
+          basisName.style.opacity = ''
+          fly.remove()
+        })
+      }
+    }
+
+    if (isElimination && step.sourceRow !== undefined) {
+      // Una franja con el color del pivote viaja de la fila pivote a la fila que cambia.
+      const source = root.querySelector(`[data-row="${step.sourceRow}"]`)
+      const target = root.querySelector(`[data-row="${String(step.changedRow)}"]`)
+      if (source && target) {
+        const from = rel(source)
+        const to = rel(target)
+        const band = document.createElement('div')
+        band.className = 'motion-band'
+        Object.assign(band.style, { top: `${from.y}px`, height: `${from.h}px`, width: `${root.scrollWidth}px` })
+        layer.appendChild(band)
+        pieces.push(band)
+        const dy = to.y - from.y
+        const travel = animate(
+          band,
+          { y: [0, dy, dy], opacity: [0.85, 0.6, 0] },
+          { duration: BAND_MS / 1000, times: [0, 0.75, 1], ease: [0.4, 0, 0.2, 1] },
+        )
+        controls.push(travel)
+        travel.then(() => band.remove())
+      }
+    }
+
+    return () => {
+      controls.forEach((c) => c.stop())
+      pieces.forEach((p) => p.remove())
+      if (hidden) hidden.style.opacity = ''
+    }
+    // Solo al llegar a un paso nuevo; el formato o el tema no repiten el movimiento.
+  }, [step.index, meaningfulMotion])
+
+  const renderRow = (row: StepRow) => {
     const isZ = row === 'Z'
-    const values: MValue[] = isZ
-      ? [...t.z, t.zRhs]
-      : [...t.rows[row].map((v) => MValue.of(v)), MValue.of(t.rhs[row])]
     const changed = step.changedRow === row
+    const source = changed && showPrevious ? step.previous : t
+    const values: MValue[] = isZ
+      ? [...source.z, source.zRhs]
+      : [...source.rows[row].map((v) => MValue.of(v)), MValue.of(source.rhs[row])]
     const isSource = !isZ && step.sourceRow === row
     const rowTone = h.rows.get(row)
-    const basisName = isZ ? 'Z' : subscript(t.variables[t.basis[row]])
-    const previousBasis = !isZ && changed && step.basisChanged ? subscript(step.previous.variables[step.previous.basis[row]]) : null
-
-    const baseShadow = changed
-      ? `inset 3px 0 0 ${TONE_COLORS[rowTone ?? tone].acento}`
-      : isSource
-        ? 'inset 3px 0 0 var(--color-linea)'
-        : 'none'
-    const border: CSSProperties = isZ ? { borderTop: '1.5px solid var(--color-tinta)' } : {}
-    const rowBorder = isZ ? '' : 'border-b border-suave'
+    const basisName = isZ ? 'Z' : t.variables[t.basis[row]]
+    const previousBasis =
+      !isZ && changed && step.basisChanged ? step.previous.variables[step.previous.basis[row]] : null
     const ratio = !isZ && showRatios ? step.ratios![row] : undefined
+    const hoverable = changed && calculations.size > 0
+    const style = (rowTone ? toneStyle(rowTone) : undefined) as CSSProperties | undefined
+
+    const className = [isZ && 'z-row', rowTone && 'marked', changed && 'changed', isSource && 'source']
+      .filter(Boolean)
+      .join(' ')
 
     return (
       <tr
         key={String(row)}
+        data-row={String(row)}
+        className={className}
+        style={style}
         data-rough={!isZ && h.boxRows.has(row) ? 'box' : undefined}
-        data-rough-color={roughColor}
+        data-rough-color={toneVars(rowTone ?? tone).accent}
       >
-        <motion.td
-          className={`${CELL} ${rowBorder} text-left font-medium transition-shadow duration-300`}
-          style={{ boxShadow: baseShadow, ...border }}
-          animate={{ backgroundColor: cellBackground(row, null) }}
-          transition={colorTransition}
-        >
+        <td className="basis">
           {previousBasis && previousBasis !== basisName && (
-            <span className="absolute top-px left-3.5 text-[11px] text-tinta-suave line-through opacity-80 sm:left-4">
-              {previousBasis}
+            <span className="old-value left">
+              <Var name={previousBasis} />
             </span>
           )}
-          <span className="inline-block">{basisName}</span>
-        </motion.td>
+          <span data-basis className="inline-block">
+            <Var name={basisName} />
+          </span>
+        </td>
         {values.map((value, column) => {
-          const calculation = changed ? calculations.get(column) : undefined
+          const calculation = changed && !showPrevious ? calculations.get(column) : undefined
           const isPivot = !isZ && h.pivot?.row === row && h.pivot.column === column
-          const isRhs = column === n
           const moved = calculation !== undefined && !calculation.previous.equals(calculation.value)
-          const tip = calculation ? formatCalculation(calculation, format) : undefined
+          const classes = [
+            column === n && 'rhs',
+            h.columns.has(column) && !rowTone && 'col',
+            isPivot && step.kind === 'leave' && 'pivot',
+            hoverable && 'cell',
+          ]
+            .filter(Boolean)
+            .join(' ')
           return (
-            <motion.td
+            <td
               key={column}
-              className={`${CELL} ${rowBorder} text-right ${isRhs ? 'border-l border-linea' : ''} ${tip ? 'tip cursor-help' : ''} ${moved ? 'font-medium' : ''}`}
-              style={{
-                ...border,
-                boxShadow: isPivot && step.kind === 'leave' ? `inset 0 0 0 2px ${TONE_COLORS.sel.acento}` : undefined,
-              }}
-              animate={{
-                backgroundColor: isPivot && step.kind === 'leave' ? '#ffffff' : cellBackground(row, column),
-              }}
-              transition={colorTransition}
-              data-tip={tip}
-              tabIndex={tip ? 0 : undefined}
-              aria-label={tip}
+              className={classes}
+              style={h.columns.has(column) && !rowTone ? (toneStyle(h.columnTone) as CSSProperties) : undefined}
+              tabIndex={hoverable ? 0 : undefined}
+              aria-label={
+                hoverable
+                  ? `${subscript(column === n ? 'Solución' : t.variables[column])}: ${formatMValue(value, format)}`
+                  : undefined
+              }
+              onPointerEnter={hoverable ? () => onHoverColumn(column) : undefined}
+              onFocus={hoverable ? () => onHoverColumn(column) : undefined}
+              onClick={hoverable ? () => onHoverColumn(column) : undefined}
             >
-              {moved && (
-                <span className="absolute top-px right-3.5 text-[11px] font-normal text-tinta-suave line-through opacity-80 sm:right-4">
-                  {formatMValue(calculation.previous, format)}
-                </span>
-              )}
+              {moved && <span className="old-value">{formatMValue(calculation.previous, format)}</span>}
               <span
                 className="inline-block"
                 data-rough={isPivot && h.circlePivot ? 'circle' : undefined}
-                data-rough-color={roughColor}
+                data-rough-color={toneVars(tone).accent}
               >
-                <AnimatedValue value={value} format={format} delay={changed ? column * 0.04 : 0} />
+                <AnimatedValue
+                  value={value}
+                  format={format}
+                  animated={animateValues}
+                  delay={changed ? column * 0.04 : 0}
+                />
               </span>
-            </motion.td>
+            </td>
           )
         })}
         {showRatios && (
-          <td className={`${CELL} ${rowBorder} min-w-[84px] text-right border-l border-dashed border-linea text-tinta-suave`} style={border}>
-            {ratio === undefined ? null : ratio === null ? (
-              '—'
-            ) : (
-              <span
-                className={
-                  row === step.leavingRow
-                    ? 'rounded-md bg-sel px-1.5 py-0.5 font-semibold text-tinta ring-1 ring-sel-acento'
-                    : ''
-                }
-              >
-                {formatNumber(ratio, format)}
-              </span>
-            )}
+          <td className={`ratio ${row === step.leavingRow ? 'min' : ''}`}>
+            {ratio === undefined ? null : ratio === null ? '—' : formatNumber(ratio, format)}
           </td>
         )}
       </tr>
@@ -208,30 +313,31 @@ export function TableauView({ step, result, format, tone }: TableauViewProps) {
   }
 
   return (
-    <div className="overflow-x-auto p-2">
-      <div ref={container} className="relative w-max min-w-full">
-        <table className="w-full border-separate border-spacing-0 font-mono text-[15px] tabular-nums">
+    <div className="tableau-wrap">
+      <div ref={container} className="relative w-max min-w-full" onPointerLeave={() => onHoverColumn(null)}>
+        <table className="tableau">
           <thead>
             <tr>
-              <th className={`${HEAD} border-b border-linea text-left`}>Base</th>
+              <th>Base</th>
               {t.variables.map((name, column) => (
-                <motion.th
+                <th
                   key={name}
-                  className={`${HEAD} border-b border-linea text-right`}
-                  animate={{ backgroundColor: h.columns.has(column) ? TONE_COLORS[h.columnTone].pastel : TRANSPARENT }}
-                  transition={colorTransition}
+                  data-head={column}
+                  className={h.columns.has(column) ? 'col' : undefined}
+                  style={h.columns.has(column) ? (toneStyle(h.columnTone) as CSSProperties) : undefined}
                 >
                   <span
-                    className={h.columns.has(column) ? 'text-tinta' : ''}
+                    data-name
+                    className="inline-block"
                     data-rough={h.underlineColumn === column ? 'underline' : undefined}
-                    data-rough-color={roughColor}
+                    data-rough-color={toneVars(h.columnTone).accent}
                   >
-                    {subscript(name)}
+                    <Var name={name} />
                   </span>
-                </motion.th>
+                </th>
               ))}
-              <th className={`${HEAD} border-b border-l border-linea text-right`}>Solución</th>
-              {showRatios && <th className={`${HEAD} border-b border-l border-dashed border-linea text-right`}>Razón</th>}
+              <th className="rhs font-sans text-[13px] text-muted">Solución</th>
+              {showRatios && <th className="ratio font-sans text-[13px]">Razón</th>}
             </tr>
           </thead>
           <tbody>
@@ -239,9 +345,9 @@ export function TableauView({ step, result, format, tone }: TableauViewProps) {
             {renderRow('Z')}
           </tbody>
         </table>
-        <div ref={layer} aria-hidden className="pointer-events-none absolute inset-0" />
+        <div ref={roughLayer} aria-hidden className="pointer-events-none absolute inset-0" />
+        <div ref={motionLayer} aria-hidden className="pointer-events-none absolute inset-0" />
       </div>
     </div>
   )
 }
-
