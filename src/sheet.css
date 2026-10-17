@@ -1,0 +1,415 @@
+/*
+ * Estilos de las piezas de la hoja: hojitas de tema, editor, ecuación viva, tabla Simplex,
+ * línea de tiempo, bitácora y tarjeta final. Usan las variables de tema de index.css.
+ * --c, --c-t y --c-ink son el color de la operación del paso actual (ver tone.ts).
+ */
+
+/* ---------- Encabezado: hojitas de papel para elegir tema ---------- */
+.paper-swatch {
+  position: relative;
+  width: 22px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  clip-path: polygon(0 0, 70% 0, 100% 22%, 100% 100%, 0 100%);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* Esquina doblada: un triángulo plano, sin degradado. */
+.paper-swatch::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 22%;
+  background: rgb(0 0 0 / 0.18);
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.paper-swatch:hover {
+  transform: translateY(-3px) rotate(-3deg);
+}
+.paper-swatch[aria-checked='true'] {
+  transform: translateY(-5px);
+  box-shadow: 0 3px 0 -1px var(--ink);
+}
+
+/* ---------- Editor ---------- */
+.editor {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font: 14px/26px var(--f-mono);
+  transition: border-color 0.2s;
+}
+.editor:focus-within {
+  border-color: color-mix(in srgb, var(--ink) 45%, var(--line));
+}
+.editor-gutter {
+  padding: 12px 10px 12px 0;
+  border-right: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+  user-select: none;
+}
+.editor-code {
+  position: relative;
+  overflow: hidden;
+}
+.editor-highlight {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 12px 14px;
+  white-space: pre;
+  color: var(--ink);
+  pointer-events: none;
+}
+.editor-code textarea {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  font: inherit;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  resize: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ink);
+}
+.editor-code textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+.editor-code textarea::selection {
+  background: var(--piv-t);
+  color: transparent;
+}
+.tk-k {
+  color: var(--zeta-ink);
+}
+.tk-v {
+  color: var(--sel-ink);
+  font-style: italic;
+}
+.tk-n {
+  color: var(--ink);
+}
+.tk-o {
+  color: var(--cero-ink);
+}
+.tk-s,
+.tk-c {
+  color: var(--muted);
+}
+.wavy {
+  text-decoration: underline wavy var(--err);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Ecuación viva ---------- */
+.live-eq {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  margin: 18px 0 12px;
+  padding: 11px 16px;
+  border-left: 3px solid var(--c);
+  background: color-mix(in srgb, var(--c-t) 45%, transparent);
+  font-family: var(--f-num);
+  font-size: 19px;
+  line-height: 1.4;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
+}
+.eq-line {
+  flex: 1;
+  min-width: 0;
+}
+.eq-then {
+  display: inline-block;
+  margin-left: 0.6em;
+}
+.eq-hl,
+.eq-target {
+  color: var(--c-ink);
+}
+.eq-old {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.eq-source {
+  border-bottom: 1.5px solid var(--piv);
+}
+.eq-hint {
+  flex-shrink: 0;
+  margin-left: 16px;
+  font: 12px/1.4 var(--f-ui);
+  color: var(--muted);
+}
+@media (max-width: 640px) {
+  .live-eq {
+    font-size: 16px;
+  }
+  .eq-hint {
+    display: none;
+  }
+}
+
+/* ---------- Tabla Simplex ---------- */
+.tableau-wrap {
+  position: relative;
+  overflow-x: auto;
+  background: var(--paper);
+  border-top: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+}
+.tableau {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--f-num);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.tableau th {
+  position: relative;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+  transition: background-color 0.35s;
+}
+.tableau td {
+  position: relative;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+  white-space: nowrap;
+  transition:
+    background-color 0.35s,
+    box-shadow 0.25s;
+}
+.tableau th:first-child,
+.tableau td:first-child {
+  text-align: left;
+}
+.tableau .rhs {
+  border-left: 1px solid var(--line);
+}
+.tableau .z-row td {
+  border-top: 1px solid var(--ink);
+  border-bottom: 0;
+}
+.tableau .col {
+  background: var(--c-t);
+}
+.tableau tr.marked td {
+  background: var(--c-t);
+}
+.tableau tr.marked td:first-child {
+  box-shadow: inset 3px 0 0 var(--c);
+}
+.tableau tr.source td:first-child {
+  box-shadow: inset 3px 0 0 var(--piv);
+}
+.tableau td.cell {
+  cursor: crosshair;
+}
+.tableau td.cell:hover,
+.tableau td.cell:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px var(--c);
+}
+.tableau td.pivot {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px var(--sel);
+}
+.tableau .ratio {
+  min-width: 84px;
+  border-left: 1px dashed var(--line);
+  color: var(--muted);
+  font-style: italic;
+}
+.tableau td.ratio.min {
+  color: var(--sel-ink);
+  font-style: normal;
+}
+.old-value {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.old-value.left {
+  left: 16px;
+  right: auto;
+}
+.motion-piece {
+  position: absolute;
+  z-index: 4;
+  font-family: var(--f-num);
+  font-size: 17px;
+  line-height: 1.6;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.motion-band {
+  position: absolute;
+  left: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--piv-t);
+  border-left: 3px solid var(--piv);
+  opacity: 0.85;
+}
+@media (max-width: 640px) {
+  .tableau,
+  .motion-piece {
+    font-size: 15px;
+  }
+  .tableau th,
+  .tableau td {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+  .old-value {
+    right: 11px;
+  }
+  .old-value.left {
+    left: 11px;
+  }
+}
+
+/* ---------- Línea de tiempo ---------- */
+.timeline {
+  position: relative;
+  margin-top: 22px;
+  padding-top: 8px;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+.timeline.dragging {
+  cursor: grabbing;
+}
+.timeline:focus-visible {
+  outline-offset: 6px;
+}
+.segment {
+  position: relative;
+  flex: 1;
+  height: 22px;
+  background: var(--rule);
+  transition: background-color 0.25s;
+}
+.segment::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--a);
+  opacity: 0.35;
+}
+.segment.done,
+.segment.current {
+  background: var(--t);
+}
+.segment.done::before {
+  opacity: 0.9;
+}
+.segment.current::before {
+  height: 100%;
+  opacity: 1;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--a);
+}
+.timeline-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 36px;
+  background: var(--ink);
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.timeline.dragging .timeline-thumb {
+  transition: none;
+}
+.timeline-label {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  padding: 3px 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 12px var(--f-ui);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- Bitácora ---------- */
+.op-log {
+  font-family: var(--f-num);
+  font-size: 15px;
+}
+.op-group {
+  padding: 10px 0 3px;
+  font: 11px var(--f-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.op-item {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  gap: 10px;
+  padding: 5px 0 5px 10px;
+  border-left: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    opacity 0.2s,
+    padding 0.2s;
+}
+.op-item.future {
+  opacity: 0.4;
+}
+.op-item.current {
+  border-left-color: var(--a);
+}
+.op-item:hover {
+  opacity: 1;
+  padding-left: 14px;
+}
+.op-number {
+  width: 16px;
+  flex-shrink: 0;
+  font: 11px var(--f-ui);
+  color: var(--muted);
+}
+
+/* ---------- Tarjeta final ---------- */
+.result-card {
+  padding: 18px 20px 20px;
+  border-top: 1.5px solid var(--ink);
+  border-left: 3px solid var(--c);
+  background: var(--paper);
+}

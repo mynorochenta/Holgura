@@ -1,26 +1,23 @@
-// Colores de cada tipo de operación (paleta Macaron). Los mismos valores están en index.css;
-// aquí se repiten en hex para que Motion pueda interpolarlos.
+// Colores de cada tipo de operación (paleta Macaron). Son variables CSS definidas por tema en
+// index.css, así que cambian solas con el tema.
 
 import type { SimplexResult } from '../core/simplex'
 import type { Step } from '../core/steps'
 
 export type Tone = 'sel' | 'piv' | 'cero' | 'zeta' | 'error'
 
-export const TONE_COLORS: Record<Tone, { pastel: string; acento: string }> = {
-  sel: { pastel: '#c4f0dc', acento: '#4bb88c' },
-  piv: { pastel: '#cfe2ff', acento: '#5b8def' },
-  cero: { pastel: '#ffd9bf', acento: '#f0955a' },
-  zeta: { pastel: '#e5d4ff', acento: '#9b6fe0' },
-  error: { pastel: '#ffdbde', acento: '#e0606c' },
+const VAR: Record<Tone, string> = { sel: 'sel', piv: 'piv', cero: 'cero', zeta: 'zeta', error: 'err' }
+
+/** Variables CSS del tono: pastel (fondo), acento (bordes) y tinta (texto de color con buen contraste). */
+export function toneVars(tone: Tone): { pastel: string; accent: string; ink: string } {
+  const name = VAR[tone]
+  return { pastel: `var(--${name}-t)`, accent: `var(--${name})`, ink: `var(--${name}-ink)` }
 }
 
-/** Clases de Tailwind por tono (escritas completas para que Tailwind las detecte). */
-export const TONE_CLASS: Record<Tone, { pastel: string; dot: string; ring: string }> = {
-  sel: { pastel: 'bg-sel', dot: 'bg-sel-acento', ring: 'ring-sel' },
-  piv: { pastel: 'bg-piv', dot: 'bg-piv-acento', ring: 'ring-piv' },
-  cero: { pastel: 'bg-cero', dot: 'bg-cero-acento', ring: 'ring-cero' },
-  zeta: { pastel: 'bg-zeta', dot: 'bg-zeta-acento', ring: 'ring-zeta' },
-  error: { pastel: 'bg-error', dot: 'bg-error-acento', ring: 'ring-error' },
+/** Fija --c, --c-t y --c-ink en un elemento para que sus hijos usen el color del tono. */
+export function toneStyle(tone: Tone): Record<string, string> {
+  const v = toneVars(tone)
+  return { '--c': v.accent, '--c-t': v.pastel, '--c-ink': v.ink }
 }
 
 export const LEGEND: { tone: Tone; label: string }[] = [
@@ -29,8 +26,6 @@ export const LEGEND: { tone: Tone; label: string }[] = [
   { tone: 'cero', label: 'Hacer cero' },
   { tone: 'zeta', label: 'Fila Z' },
 ]
-
-export const TRANSPARENT = 'rgba(255, 255, 255, 0)'
 
 export function resultTone(result: SimplexResult): Tone {
   if (result.status === 'optimal') return 'sel'

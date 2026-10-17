@@ -1,70 +1,203 @@
 @import 'tailwindcss';
 
-@import '@fontsource/ibm-plex-sans/400.css';
-@import '@fontsource/ibm-plex-sans/500.css';
-@import '@fontsource/ibm-plex-sans/600.css';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/schibsted-grotesk/400.css';
+@import '@fontsource/schibsted-grotesk/500.css';
+@import '@fontsource/schibsted-grotesk/600.css';
+@import '@fontsource/fragment-mono/400.css';
 @import 'katex/dist/katex.min.css';
 
 /*
- * Paleta "Macaron": fondo crema, texto oscuro y pares pastel / acento por tipo de operación.
- * El pastel va de fondo (fila que cambia, chip, operación activa); el acento solo en bordes,
- * puntos y anillos. Todo el texto se mantiene en tono oscuro.
+ * Temas: Papel (predeterminado), Blanco, Sepia y Pizarra (oscuro). Valores de docs/boceto-estilo.html;
+ * el gris "muted" se oscureció un poco en los temas claros para llegar a contraste 4.5:1.
+ *
+ * Paleta "Macaron": pares pastel / acento por tipo de operación. El pastel va de fondo; el acento,
+ * en bordes y marcas. Para texto de color se usa --*-ink: el acento mezclado con la tinta (contraste).
  */
-@theme {
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+:root,
+[data-theme='papel'] {
+  --bg: #f4eee2;
+  --paper: #faf6ee;
+  --ink: #2a2620;
+  --muted: #6e665a;
+  --line: #d9cebb;
+  --rule: #e7dece;
+  --margin: #d99a92;
+  --grain: 0.55;
+  --sel-t: #c4f0dc;
+  --sel: #3a9d75;
+  --piv-t: #cfe2ff;
+  --piv: #4b7fe0;
+  --cero-t: #ffd9bf;
+  --cero: #e0803f;
+  --zeta-t: #e5d4ff;
+  --zeta: #8a5cd6;
+  --err-t: #ffdbde;
+  --err: #d9505e;
+  --ink-mix: 55%;
+  color-scheme: light;
+}
+[data-theme='blanco'] {
+  --bg: #ffffff;
+  --paper: #ffffff;
+  --ink: #25232b;
+  --muted: #6a6672;
+  --line: #e2e0e6;
+  --rule: #eeecf1;
+  --margin: #ebb4ae;
+  --grain: 0.25;
+}
+[data-theme='sepia'] {
+  --bg: #ece0c8;
+  --paper: #f3e9d6;
+  --ink: #3a2e22;
+  --muted: #695946;
+  --line: #d2c0a0;
+  --rule: #e0d1b5;
+  --margin: #cc8e80;
+  --grain: 0.7;
+}
+[data-theme='pizarra'] {
+  --bg: #1a1c20;
+  --paper: #202328;
+  --ink: #e9e5dd;
+  --muted: #9a958c;
+  --line: #3a3d44;
+  --rule: #2d3036;
+  --margin: #7a4a47;
+  --grain: 0.35;
+  --sel-t: #1f3b31;
+  --sel: #6fd3a6;
+  --piv-t: #22324f;
+  --piv: #8eb2f5;
+  --cero-t: #45301f;
+  --cero: #f2a774;
+  --zeta-t: #352b4d;
+  --zeta: #c0a2f2;
+  --err-t: #4a2328;
+  --err: #f08a94;
+  --ink-mix: 100%;
+  color-scheme: dark;
+}
+:root {
+  --sel-ink: color-mix(in srgb, var(--sel) var(--ink-mix), var(--ink));
+  --piv-ink: color-mix(in srgb, var(--piv) var(--ink-mix), var(--ink));
+  --cero-ink: color-mix(in srgb, var(--cero) var(--ink-mix), var(--ink));
+  --zeta-ink: color-mix(in srgb, var(--zeta) var(--ink-mix), var(--ink));
+  --err-ink: color-mix(in srgb, var(--err) var(--ink-mix), var(--ink));
+  --f-ui: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --f-mono: 'Fragment Mono', ui-monospace, monospace;
+  --f-num: KaTeX_Main, 'Times New Roman', serif;
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-  --color-papel: #fffdf9;
-  --color-hoja: #ffffff;
-  --color-tinta: #25232b;
-  --color-tinta-suave: #5e5a66;
-  --color-linea: #ebe6df;
-  --color-suave: #f6f2ec;
+@theme inline {
+  --font-sans: var(--f-ui);
+  --font-mono: var(--f-mono);
+  --font-display: var(--f-num);
+  --font-math: KaTeX_Math, 'Times New Roman', serif;
 
-  /* Selección (entra / sale) */
-  --color-sel: #c4f0dc;
-  --color-sel-acento: #4bb88c;
-  /* Pivote a 1 */
-  --color-piv: #cfe2ff;
-  --color-piv-acento: #5b8def;
-  /* Hacer cero */
-  --color-cero: #ffd9bf;
-  --color-cero-acento: #f0955a;
-  /* Fila Z */
-  --color-zeta: #e5d4ff;
-  --color-zeta-acento: #9b6fe0;
-  /* Errores del editor */
-  --color-error: #ffdbde;
-  --color-error-acento: #e0606c;
+  --color-bg: var(--bg);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-rule: var(--rule);
 
-  --shadow-hoja: 0 1px 2px rgb(60 50 90 / 0.04), 0 10px 30px -12px rgb(60 50 90 / 0.12);
+  --color-sel: var(--sel);
+  --color-sel-t: var(--sel-t);
+  --color-sel-ink: var(--sel-ink);
+  --color-piv: var(--piv);
+  --color-piv-t: var(--piv-t);
+  --color-piv-ink: var(--piv-ink);
+  --color-cero: var(--cero);
+  --color-cero-t: var(--cero-t);
+  --color-cero-ink: var(--cero-ink);
+  --color-zeta: var(--zeta);
+  --color-zeta-t: var(--zeta-t);
+  --color-zeta-ink: var(--zeta-ink);
+  --color-err: var(--err);
+  --color-err-t: var(--err-t);
+  --color-err-ink: var(--err-ink);
+}
+
+html {
+  background: var(--bg);
+  transition: background-color 0.4s;
 }
 
 body {
-  @apply bg-papel text-tinta font-sans antialiased;
+  @apply min-h-screen font-sans text-[15px] leading-relaxed text-ink antialiased;
+}
+
+/* Grano de papel: ruido SVG fijo sobre toda la página. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--noise);
+  opacity: var(--grain);
+  mix-blend-mode: multiply;
+  z-index: 50;
+}
+[data-theme='pizarra'] body::after {
+  mix-blend-mode: screen;
+  filter: invert(1);
+}
+
+::selection {
+  background: var(--piv-t);
+  color: var(--ink);
+}
+
+/* Variable matemática: letra en cursiva de LaTeX y subíndice en la romana. */
+.mv {
+  font-family: KaTeX_Math, 'Times New Roman', serif;
+  font-style: italic;
+}
+.mv + sub {
+  font-family: KaTeX_Main, 'Times New Roman', serif;
+  font-size: 0.7em;
+  font-style: normal;
+  line-height: 0;
 }
 
 @layer components {
-  .card {
-    @apply rounded-2xl border border-linea bg-hoja shadow-hoja;
+  /* Hoja con margen de cuaderno (doble línea rosada), oculto en celular. */
+  .sheet {
+    @apply relative mx-auto mb-16 max-w-[1200px] px-3.5 sm:px-7;
+  }
+  .sheet::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-left: 1px solid var(--margin);
+    border-right: 1px solid var(--margin);
+    opacity: 0.55;
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .sheet::before {
+      display: block;
+    }
   }
 
   .kicker {
-    @apply text-xs font-medium tracking-[0.08em] text-tinta-suave uppercase;
+    @apply text-[11px] font-medium tracking-[0.12em] text-muted uppercase;
   }
 
   .btn {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-linea bg-hoja px-3.5 py-2 text-sm font-medium text-tinta;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[2px] border border-line bg-transparent px-3 py-1.5 text-[13px] text-ink;
     transition:
-      transform 0.15s ease,
-      box-shadow 0.2s ease,
-      border-color 0.2s ease;
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.15s ease;
   }
   .btn:hover:not(:disabled) {
-    @apply border-tinta-suave shadow-hoja;
-    transform: translateY(-1px);
+    @apply border-ink;
   }
   .btn:active:not(:disabled) {
     transform: scale(0.97);
@@ -72,45 +205,46 @@ body {
   .btn:disabled {
     @apply cursor-not-allowed opacity-40;
   }
-  .btn:focus-visible {
-    @apply outline-2 outline-offset-2 outline-piv-acento;
-  }
   .btn-primary {
-    @apply border-tinta bg-tinta text-papel;
+    @apply border-ink bg-ink px-5 text-paper;
   }
   .btn-primary:hover:not(:disabled) {
-    @apply border-tinta;
+    background: color-mix(in srgb, var(--ink) 88%, var(--paper));
   }
 
   .field {
-    @apply w-full rounded-md border border-linea bg-hoja px-2 py-1.5 text-right font-mono text-sm text-tinta;
+    @apply w-full rounded-[2px] border border-line bg-paper px-2 py-1 text-right font-mono text-sm text-ink;
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
   }
   .field:hover {
-    @apply border-tinta-suave/50;
+    border-color: color-mix(in srgb, var(--ink) 40%, var(--line));
   }
   .field:focus {
-    @apply border-piv-acento outline-none;
-    box-shadow: 0 0 0 3px var(--color-piv);
+    @apply border-piv outline-none;
+    box-shadow: 0 0 0 2px var(--piv-t);
   }
   .field[aria-invalid='true'] {
-    @apply border-error-acento bg-error;
+    @apply border-err bg-err-t;
   }
+}
+
+:focus-visible {
+  outline: 2px solid var(--piv);
+  outline-offset: 2px;
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-
 .fade-up {
   animation: fade-up 0.35s ease both;
 }
@@ -120,29 +254,7 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Tooltip con el cálculo de cada celda de la fila que cambia. */
-.tip[data-tip]:hover::after,
-.tip[data-tip]:focus-visible::after {
-  content: attr(data-tip);
-  position: absolute;
-  bottom: calc(100% + 4px);
-  right: 6px;
-  z-index: 5;
-  padding: 6px 9px;
-  border-radius: 6px;
-  background: var(--color-tinta);
-  color: var(--color-papel);
-  font-size: 12px;
-  font-weight: 400;
-  white-space: nowrap;
-  pointer-events: none;
-  animation: fade-up 0.15s ease both;
-}
-.tip:focus-visible {
-  outline: 2px solid var(--color-piv-acento);
-  outline-offset: -2px;
 }

@@ -4,11 +4,18 @@
 // controla React (filas y celdas de la tabla), cada anotación se dibuja sobre un "proxy": un div
 // invisible con la misma posición y tamaño que el elemento, dentro de una capa que React deja vacía.
 //
-// Marcado: data-rough="circle | box | underline" y data-rough-color="#hex".
+// Marcado: data-rough="circle | box | underline" y data-rough-color="var(--sel)" (o un color fijo).
+// Las variables CSS se resuelven al dibujar: la clave debe cambiar con el tema para redibujar.
 
 import { annotate } from 'rough-notation'
 import type { RoughAnnotation, RoughAnnotationType } from 'rough-notation/lib/model'
 import { useEffect, type RefObject } from 'react'
+
+/** "var(--sel)" → el color que tiene esa variable en el tema actual. */
+function resolveColor(color: string | undefined, element: Element): string | undefined {
+  const match = color && /^var\((--[\w-]+)\)$/.exec(color)
+  return match ? getComputedStyle(element).getPropertyValue(match[1]).trim() : color
+}
 
 const PADDING: Partial<Record<RoughAnnotationType, number | [number, number]>> = {
   circle: [5, 11],
@@ -55,7 +62,7 @@ export function useRoughAnnotations(
         const type = element.dataset.rough as RoughAnnotationType
         const annotation = annotate(proxy, {
           type,
-          color: element.dataset.roughColor,
+          color: resolveColor(element.dataset.roughColor, element),
           animate: withAnimation,
           animationDuration: type === 'underline' ? 450 : 650,
           strokeWidth: type === 'circle' ? 1.8 : 1.6,

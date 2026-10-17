@@ -1,11 +1,12 @@
 import { motion, useReducedMotion } from 'motion/react'
+import type { CSSProperties } from 'react'
 import { formatNumber, type Fraction, type NumberFormat } from '../core/fraction'
 import { MAX_ITERATIONS, explainInfeasibility, type SimplexResult } from '../core/simplex'
 import type { Verification } from '../core/verify'
 import CountUp from './reactbits/CountUp'
-import SpotlightCard from './reactbits/SpotlightCard'
-import { joinNames, subscript } from './text'
-import { TONE_CLASS, resultTone, type Tone } from './tone'
+import { MathText, Var } from './MathText'
+import { joinNames } from './text'
+import { resultTone, toneStyle } from './tone'
 
 interface StatusMessage {
   label: string
@@ -59,13 +60,13 @@ function describeStatus(result: SimplexResult, format: NumberFormat): StatusMess
       return {
         label: 'Infactible',
         title: 'El problema no tiene solución factible',
-        body: `Las restricciones se contradicen: ningún punto las cumple todas a la vez.${detail ? ` Al terminar el método, ${subscript(detail)}.` : ''}`,
+        body: `Las restricciones se contradicen: ningún punto las cumple todas a la vez.${detail ? ` Al terminar el método, ${detail}.` : ''}`,
         notes: [],
       }
     }
     case 'unbounded': {
       const column = result.unboundedColumn
-      const name = column === undefined ? 'una variable' : subscript(result.finalTableau.variables[column])
+      const name = column === undefined ? 'una variable' : result.finalTableau.variables[column]
       return {
         label: 'No acotado',
         title: 'El problema no está acotado',
@@ -101,23 +102,23 @@ function VerificationLine({ verification }: { verification: Verification }) {
   if (verification.matches) {
     return (
       <div className="flex items-start gap-3">
-        <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-sel-acento ring-4 ring-sel" />
+        <span className="mt-[7px] h-3 w-[3px] shrink-0 bg-sel" />
         <div>
           <p className="font-medium">Coincide con un solver independiente</p>
-          <p className="text-sm text-tinta-suave">
-            javascript-lp-solver resolvió el mismo modelo por su cuenta y {externalText}.
+          <p className="text-[13px] text-muted">
+            javascript-lp-solver resolvió el mismo modelo por su cuenta y <MathText text={externalText} />.
           </p>
         </div>
       </div>
     )
   }
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-error-acento/40 bg-error/50 p-3">
-      <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-error-acento" />
+    <div className="flex items-start gap-3 border-l-[3px] border-err bg-err-t/50 px-3 py-2.5">
       <div>
         <p className="font-medium">No coincide con el solver independiente</p>
-        <p className="text-sm">
-          Holgura {ownText}, pero javascript-lp-solver {externalText}. Revisa el modelo antes de usar este resultado.
+        <p className="text-[13px]">
+          Holgura <MathText text={ownText} />, pero javascript-lp-solver <MathText text={externalText} />. Revisa el
+          modelo antes de usar este resultado.
         </p>
       </div>
     </div>
@@ -155,21 +156,15 @@ function ValueTile({
   emphasis?: boolean
 }) {
   return (
-    <div className={emphasis ? 'rounded-xl bg-sel/60 px-4 py-3 ring-1 ring-sel-acento/50' : 'px-1 py-3'}>
-      <div className="kicker normal-case">{name}</div>
-      <div className={`mt-0.5 font-mono font-medium tabular-nums ${emphasis ? 'text-3xl' : 'text-2xl'}`}>
+    <div className={emphasis ? 'border-l-[3px] border-sel bg-sel-t/60 px-4 py-2.5' : 'py-2.5 pl-1'}>
+      <div className="font-display text-[15px] text-muted">
+        <MathText text={name} />
+      </div>
+      <div className={`font-display leading-tight tabular-nums ${emphasis ? 'text-[32px]' : 'text-[26px]'}`}>
         <CountedValue value={value} format={format} />
       </div>
     </div>
   )
-}
-
-const TONE_BAR: Record<Tone, string> = {
-  sel: 'bg-sel-acento',
-  piv: 'bg-piv-acento',
-  cero: 'bg-cero-acento',
-  zeta: 'bg-zeta-acento',
-  error: 'bg-error-acento',
 }
 
 /** Tarjeta final: estado, valores, Z, holguras y verificación con el solver. */
@@ -190,56 +185,62 @@ export function ResultSummary({
   const solved = result.status === 'optimal'
 
   return (
-    <SpotlightCard className="overflow-hidden" aria-live="polite">
-      <span className={`absolute inset-y-0 left-0 w-1 ${TONE_BAR[tone]}`} />
-      <div className="relative p-5 pl-6 sm:p-6 sm:pl-7">
-        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${TONE_CLASS[tone].pastel}`}>
-          {status.label}
-        </span>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{status.title}</h2>
-        <p className="mt-1.5 max-w-[68ch] text-tinta-suave">{status.body}</p>
-        {status.notes.map((note) => (
-          <p key={note} className="mt-2 max-w-[68ch] text-sm text-tinta-suave">
-            {note}
-          </p>
-        ))}
+    <section
+      className="result-card"
+      style={toneStyle(tone) as CSSProperties}
+      aria-live="polite"
+      aria-labelledby="resultado"
+    >
+      <div className="kicker text-[var(--c-ink)]">{status.label}</div>
+      <h3 id="resultado" className="mt-1 font-display text-[25px] leading-tight font-normal">
+        {status.title}
+      </h3>
+      <p className="mt-1.5 max-w-[68ch]">
+        <MathText text={status.body} />
+      </p>
+      {status.notes.map((note) => (
+        <p key={note} className="mt-2 max-w-[68ch] text-[13px] text-muted">
+          <MathText text={note} />
+        </p>
+      ))}
 
-        {solved && (
-          <>
-            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))]">
-              <div className="col-span-2 sm:col-span-1">
-                <ValueTile
-                  name={result.sense === 'max' ? 'Z máximo' : 'Z mínimo'}
-                  value={result.z}
-                  format={format}
-                  emphasis
-                />
-              </div>
-              {decision.map((name) => (
-                <ValueTile key={name} name={subscript(name)} value={result.values[name]} format={format} />
-              ))}
+      {solved && (
+        <>
+          <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))]">
+            <div className="col-span-2 sm:col-span-1">
+              <ValueTile
+                name={result.sense === 'max' ? 'Z máximo' : 'Z mínimo'}
+                value={result.z}
+                format={format}
+                emphasis
+              />
             </div>
+            {decision.map((name) => (
+              <ValueTile key={name} name={name} value={result.values[name]} format={format} />
+            ))}
+          </div>
 
-            {auxiliary.length > 0 && (
-              <div className="mt-4 border-t border-linea pt-4">
-                <h3 className="kicker">Holguras y excesos</h3>
-                <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-1 font-mono text-sm">
-                  {auxiliary.map((name) => (
-                    <div key={name} className="flex gap-2">
-                      <dt className="text-tinta-suave">{subscript(name)}</dt>
-                      <dd className="tabular-nums">{formatNumber(result.values[name], format)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-          </>
-        )}
+          {auxiliary.length > 0 && (
+            <div className="mt-4 border-t border-rule pt-3.5">
+              <h4 className="kicker">Holguras y excesos</h4>
+              <dl className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 font-display text-[16px]">
+                {auxiliary.map((name) => (
+                  <div key={name} className="flex gap-2">
+                    <dt className="text-muted">
+                      <Var name={name} />
+                    </dt>
+                    <dd>= {formatNumber(result.values[name], format)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+        </>
+      )}
 
-        <div className="mt-6 border-t border-linea pt-5">
-          <VerificationLine verification={verification} />
-        </div>
+      <div className="mt-5 border-t border-rule pt-4">
+        <VerificationLine verification={verification} />
       </div>
-    </SpotlightCard>
+    </section>
   )
 }
