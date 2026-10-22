@@ -15,7 +15,7 @@ export function Header({ format, onFormatChange, theme, onThemeChange }: HeaderP
   return (
     <header className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-4 px-4 pt-5 pb-3.5 sm:px-7 sm:pt-6">
       <div>
-        <h1 className="font-display text-[29px] leading-none tracking-[-0.01em]">Holgura</h1>
+        <h1 className="font-display text-[25px] leading-none tracking-[-0.01em] sm:text-[29px]">Holgura</h1>
         <p className="mt-1.5 text-xs tracking-[0.02em] text-muted">Programación lineal, paso a paso</p>
       </div>
       <div className="flex items-center gap-4 text-xs text-muted sm:gap-5">
@@ -37,14 +37,13 @@ export function Header({ format, onFormatChange, theme, onThemeChange }: HeaderP
           Formato
           <b className="min-w-7 text-center font-display text-sm font-normal">{format === 'decimal' ? '2.5' : '5/2'}</b>
         </button>
-        <div className="flex items-end gap-[7px]" role="radiogroup" aria-label="Tema">
+        <div className="flex items-end gap-[7px]" role="group" aria-label="Tema de la hoja">
           {THEMES.map((t) => (
             <button
               key={t.id}
               type="button"
-              role="radio"
-              aria-checked={theme === t.id}
-              aria-label={t.label}
+              aria-pressed={theme === t.id}
+              aria-label={`Tema ${t.label}`}
               title={t.label}
               className="paper-swatch"
               style={{ background: t.swatch }}

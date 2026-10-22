@@ -122,10 +122,13 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
           <div className="mt-6 grid gap-x-9 gap-y-8 lg:grid-cols-[minmax(0,1fr)_280px]">
             <div className="min-w-0">
               <div key={current} className={animateValues ? 'fade-up' : undefined} aria-live="polite">
-                <div className="kicker">{text.kicker}</div>
-                <h3 className="mt-1 mb-1.5 font-display text-[22px] leading-snug font-normal sm:text-[24px]">
-                  <MathText text={text.title} />
-                </h3>
+                {/* Título del paso con su iteración en la misma línea, a la derecha. */}
+                <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-4">
+                  <h3 className="font-display text-[22px] leading-snug font-normal sm:text-[24px]">
+                    <MathText text={text.title} />
+                  </h3>
+                  <span className="text-[13px] text-muted">{text.kicker}</span>
+                </div>
                 <p className="max-w-[66ch] text-[15.5px]">
                   <MathText text={text.explanation} />
                 </p>
@@ -162,7 +165,7 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
               </AnimatePresence>
             </div>
 
-            {/* Columna derecha: aquí entra la gráfica (etapa 4b), encima de la bitácora. */}
+            {/* Columna derecha: bitácora de operaciones. */}
             <aside className="min-w-0 lg:sticky lg:top-5 lg:self-start">
               <OperationLog texts={texts} tones={tones} current={current} onGo={(i) => go({ index: i })} />
             </aside>

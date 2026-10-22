@@ -29,7 +29,7 @@
 .paper-swatch:hover {
   transform: translateY(-3px) rotate(-3deg);
 }
-.paper-swatch[aria-checked='true'] {
+.paper-swatch[aria-pressed='true'] {
   transform: translateY(-5px);
   box-shadow: 0 3px 0 -1px var(--ink);
 }
@@ -43,8 +43,13 @@
   font: 14px/26px var(--f-mono);
   transition: border-color 0.2s;
 }
+.editor:hover {
+  border-color: color-mix(in srgb, var(--ink) 40%, var(--line));
+}
+/* El textarea no lleva contorno propio: el foco se marca en todo el editor, igual que en los campos. */
 .editor:focus-within {
-  border-color: color-mix(in srgb, var(--ink) 45%, var(--line));
+  border-color: var(--piv);
+  box-shadow: 0 0 0 2px var(--piv-t);
 }
 .editor-gutter {
   padding: 12px 10px 12px 0;
@@ -113,6 +118,14 @@
   text-decoration: underline wavy var(--err);
   text-decoration-skip-ink: none;
   text-underline-offset: 4px;
+}
+
+/* Vista previa del modelo: alineada a la izquierda, bajo su etiqueta. */
+.model-preview .katex-display {
+  margin: 10px 0 0;
+}
+.model-preview .katex-display > .katex {
+  text-align: left;
 }
 
 /* ---------- Ecuación viva ---------- */
@@ -369,10 +382,8 @@
   font-size: 15px;
 }
 .op-group {
-  padding: 10px 0 3px;
-  font: 11px var(--f-ui);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 12px 0 3px;
+  font: 500 12px var(--f-ui);
   color: var(--muted);
 }
 .op-item {

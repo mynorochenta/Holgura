@@ -15,14 +15,14 @@
  */
 :root,
 [data-theme='papel'] {
-  --bg: #f4eee2;
-  --paper: #faf6ee;
-  --ink: #2a2620;
-  --muted: #6e665a;
-  --line: #d9cebb;
-  --rule: #e7dece;
-  --margin: #d99a92;
-  --grain: 0.55;
+  --bg: #f0efeb;
+  --paper: #fbfbfa;
+  --ink: #23221f;
+  --muted: #625f58;
+  --line: #d8d4cb;
+  --rule: #e6e3dc;
+  --margin: #e09aa4;
+  --grain: 0.45;
   --sel-t: #c4f0dc;
   --sel: #3a9d75;
   --piv-t: #cfe2ff;
@@ -165,7 +165,7 @@ body::after {
 @layer components {
   /* Hoja con margen de cuaderno (doble línea rosada), oculto en celular. */
   .sheet {
-    @apply relative mx-auto mb-16 max-w-[1200px] px-3.5 sm:px-7;
+    @apply relative mx-auto mb-16 max-w-[1200px] px-4 sm:px-7;
   }
   .sheet::before {
     content: '';
@@ -185,8 +185,9 @@ body::after {
     }
   }
 
+  /* Etiqueta de bloque: en minúsculas y legible, sin versalitas espaciadas. */
   .kicker {
-    @apply text-[11px] font-medium tracking-[0.12em] text-muted uppercase;
+    @apply text-[13px] font-medium text-muted;
   }
 
   .btn {
@@ -213,7 +214,7 @@ body::after {
   }
 
   .field {
-    @apply w-full rounded-[2px] border border-line bg-paper px-2 py-1 text-right font-mono text-sm text-ink;
+    @apply w-full rounded-[2px] border border-line bg-paper px-2 py-1 text-right font-display text-[15px] text-ink tabular-nums;
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
@@ -233,6 +234,14 @@ body::after {
 :focus-visible {
   outline: 2px solid var(--piv);
   outline-offset: 2px;
+}
+
+/* Toques sin la espera del doble toque ni el destello gris de los navegadores móviles. */
+button,
+a,
+select {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes fade-up {

@@ -19,8 +19,8 @@ export function PreparationCard({
   const adjustment = result?.bigMAdjustment ?? null
 
   return (
-    <div className="grid gap-x-9 gap-y-4 border-b border-rule pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-      <section aria-labelledby="modelo-resuelto">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-9 gap-y-5 border-b border-rule pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <section aria-labelledby="modelo-resuelto" className="min-w-0">
         <h3 id="modelo-resuelto" className="kicker">
           Modelo
         </h3>
@@ -28,7 +28,7 @@ export function PreparationCard({
       </section>
 
       {result && (
-        <section aria-labelledby="preparacion" className="md:border-l md:border-rule md:pl-9">
+        <section aria-labelledby="preparacion" className="min-w-0 md:border-l md:border-rule md:pl-9">
           <h3 id="preparacion" className="kicker">
             Preparación
           </h3>

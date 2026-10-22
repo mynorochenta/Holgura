@@ -107,7 +107,7 @@ export function TextEditor({ value, onChange, errors }: TextEditorProps) {
 
       <div id="editor-mensajes" className="mt-2 min-h-[22px] text-[13px]" aria-live="polite">
         {errors.length === 0 ? (
-          <p className="text-muted">Una restricción por línea. Ctrl + Enter para resolver.</p>
+          <p className="text-muted">Una restricción por línea. Ctrl&nbsp;+&nbsp;Enter para resolver.</p>
         ) : (
           <ul className="space-y-0.5">
             {errors.map((error) => (
