@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 export type Theme = 'papel' | 'blanco' | 'sepia' | 'pizarra'
 
 export const THEMES: { id: Theme; label: string; swatch: string }[] = [
-  { id: 'papel', label: 'Papel', swatch: '#F4EEE2' },
+  { id: 'papel', label: 'Papel', swatch: '#F0EFEB' },
   { id: 'blanco', label: 'Blanco', swatch: '#FFFFFF' },
   { id: 'sepia', label: 'Sepia', swatch: '#ECE0C8' },
   { id: 'pizarra', label: 'Pizarra', swatch: '#1A1C20' },
@@ -30,6 +30,9 @@ export function useTheme(): [Theme, (theme: Theme) => void] {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
+    // La barra del navegador en celular toma el color del papel.
+    const swatch = THEMES.find((t) => t.id === theme)?.swatch
+    if (swatch) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', swatch)
     try {
       localStorage.setItem(STORAGE_KEY, theme)
     } catch {

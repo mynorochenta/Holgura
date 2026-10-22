@@ -1,87 +1,14 @@
 import { motion, useReducedMotion } from 'motion/react'
 import type { CSSProperties } from 'react'
 import { formatNumber, type Fraction, type NumberFormat } from '../core/fraction'
-import { MAX_ITERATIONS, explainInfeasibility, type SimplexResult } from '../core/simplex'
+import type { SimplexResult } from '../core/simplex'
 import type { Verification } from '../core/verify'
 import CountUp from './reactbits/CountUp'
 import { MathText, Var } from './MathText'
-import { joinNames } from './text'
 import { resultTone, toneStyle } from './tone'
-
-interface StatusMessage {
-  label: string
-  title: string
-  body: string
-  notes: string[]
-}
 
 function iterationsText(count: number): string {
   return count === 1 ? '1 iteración' : `${count} iteraciones`
-}
-
-function describeStatus(result: SimplexResult, format: NumberFormat): StatusMessage {
-  const multiple = result.warnings.find((w) => w.kind === 'multiple_optima')
-  const degenerate = result.warnings.filter((w) => w.kind === 'degeneracy')
-  const degeneracyNote =
-    degenerate.length > 0
-      ? `Hubo empate en la razón mínima (iteración ${degenerate.map((w) => w.iteration).join(', ')}): la solución es degenerada, con al menos una variable básica igual a 0.`
-      : null
-
-  switch (result.status) {
-    case 'optimal': {
-      const steps = `Se llegó en ${iterationsText(result.iterations.length)}.`
-      if (multiple) {
-        const one = multiple.variables.length === 1
-        return {
-          label: 'Óptimo',
-          title: 'Soluciones múltiples',
-          body: `Esta es una solución óptima, pero no la única: ${joinNames(multiple.variables)} no ${one ? 'está' : 'están'} en la base y ${one ? 'tiene' : 'tienen'} 0 en la fila Z, así que puede${one ? '' : 'n'} entrar sin cambiar el valor de Z. ${steps}`,
-          notes: degeneracyNote ? [degeneracyNote] : [],
-        }
-      }
-      if (degeneracyNote) {
-        return {
-          label: 'Óptimo',
-          title: 'Solución óptima degenerada',
-          body: `${degeneracyNote} El valor de Z es óptimo. ${steps}`,
-          notes: [],
-        }
-      }
-      return {
-        label: 'Óptimo',
-        title: 'Solución óptima',
-        body: `Ya no quedan valores negativos en la fila Z: ninguna variable puede mejorar el resultado. ${steps}`,
-        notes: [],
-      }
-    }
-    case 'infeasible': {
-      // "El problema no tiene solución factible: la artificial A2 quedó…" → solo el detalle.
-      const detail = explainInfeasibility(result, format)?.split(': ')[1]
-      return {
-        label: 'Infactible',
-        title: 'El problema no tiene solución factible',
-        body: `Las restricciones se contradicen: ningún punto las cumple todas a la vez.${detail ? ` Al terminar el método, ${detail}.` : ''}`,
-        notes: [],
-      }
-    }
-    case 'unbounded': {
-      const column = result.unboundedColumn
-      const name = column === undefined ? 'una variable' : result.finalTableau.variables[column]
-      return {
-        label: 'No acotado',
-        title: 'El problema no está acotado',
-        body: `${name} puede crecer sin límite: su columna no tiene coeficientes positivos, así que ninguna restricción la detiene y Z mejora indefinidamente.`,
-        notes: [],
-      }
-    }
-    case 'iteration_limit':
-      return {
-        label: 'Sin terminar',
-        title: `Se alcanzó el límite de ${MAX_ITERATIONS} iteraciones`,
-        body: 'El método no llegó al óptimo dentro del límite. Puede deberse a un ciclo por degeneración.',
-        notes: [],
-      }
-  }
 }
 
 const STATUS_NAME: Record<string, string> = {
@@ -102,7 +29,7 @@ function VerificationLine({ verification }: { verification: Verification }) {
   if (verification.matches) {
     return (
       <div className="flex items-start gap-3">
-        <span className="mt-[7px] h-3 w-[3px] shrink-0 bg-sel" />
+        <span aria-hidden className="mt-[7px] h-3 w-[3px] shrink-0 bg-sel" />
         <div>
           <p className="font-medium">Coincide con un solver independiente</p>
           <p className="text-[13px] text-muted">
@@ -167,7 +94,10 @@ function ValueTile({
   )
 }
 
-/** Tarjeta final: estado, valores, Z, holguras y verificación con el solver. */
+/**
+ * Tarjeta final: valores de la solución, holguras y verificación con el solver. El estado y su
+ * explicación ya están en el texto del último paso, así que aquí no se repiten.
+ */
 export function ResultSummary({
   result,
   verification,
@@ -177,7 +107,6 @@ export function ResultSummary({
   verification: Verification
   format: NumberFormat
 }) {
-  const status = describeStatus(result, format)
   const tone = resultTone(result)
   const variables = result.finalTableau.variables
   const decision = variables.filter((_, j) => result.finalTableau.kinds[j] === 'decision')
@@ -191,22 +120,16 @@ export function ResultSummary({
       aria-live="polite"
       aria-labelledby="resultado"
     >
-      <div className="kicker text-[var(--c-ink)]">{status.label}</div>
-      <h3 id="resultado" className="mt-1 font-display text-[25px] leading-tight font-normal">
-        {status.title}
-      </h3>
-      <p className="mt-1.5 max-w-[68ch]">
-        <MathText text={status.body} />
-      </p>
-      {status.notes.map((note) => (
-        <p key={note} className="mt-2 max-w-[68ch] text-[13px] text-muted">
-          <MathText text={note} />
-        </p>
-      ))}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 id="resultado" className="font-display text-[22px] leading-tight font-normal">
+          {solved ? 'Valores óptimos' : 'Comprobación'}
+        </h3>
+        {solved && <span className="text-[13px] text-muted">{iterationsText(result.iterations.length)}</span>}
+      </div>
 
       {solved && (
         <>
-          <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))]">
+          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))]">
             <div className="col-span-2 sm:col-span-1">
               <ValueTile
                 name={result.sense === 'max' ? 'Z máximo' : 'Z mínimo'}
@@ -238,7 +161,7 @@ export function ResultSummary({
         </>
       )}
 
-      <div className="mt-5 border-t border-rule pt-4">
+      <div className={solved ? 'mt-5 border-t border-rule pt-4' : 'mt-3'}>
         <VerificationLine verification={verification} />
       </div>
     </section>

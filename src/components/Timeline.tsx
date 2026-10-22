@@ -134,7 +134,7 @@ export function Timeline({ texts, tones, current, onGo }: TimelineProps) {
                 )
               })}
             </div>
-            <div className="truncate text-[11px] tracking-[0.06em] text-muted uppercase">
+            <div className="truncate text-xs text-muted">
               <span className="hidden sm:inline">{group.label}</span>
               <span className="sm:hidden">{shortLabel(group.label)}</span>
             </div>

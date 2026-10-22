@@ -160,7 +160,7 @@ export function TableEditor({ initialModel, onChange }: TableEditorProps) {
       </div>
 
       <div className="mt-5 overflow-x-auto border-y-[1.5px] border-ink bg-paper">
-        <table className="w-full border-separate border-spacing-0 font-mono text-sm">
+        <table className="w-full border-separate border-spacing-0 text-sm">
           <thead>
             <tr className="font-display text-[15px] text-ink">
               <th className="sticky left-0 border-b border-line bg-paper px-3 py-2.5 text-left font-normal" />

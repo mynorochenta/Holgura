@@ -36,22 +36,22 @@
 | Explicación por iteración | Con las operaciones de renglón estándar: "Se divide R1 entre 2 para que el pivote sea 1"; "R2 ← R2 − 3·R1". Sin referencias a la clase |
 | Números (CONFIRMADO) | **Decimales por defecto** (como en las diapositivas), con un botón para cambiar a fracciones. Internamente todo se calcula con fracciones exactas (fraction.js) para no acumular errores de redondeo |
 | Flujo de trabajo | Claude (chat del proyecto) redacta los prompts; Mynor los pega en Claude Code, que crea y prueba los archivos. Este archivo vive en el repo como `CLAUDE.md` |
-| Alcance base (CONFIRMADO) | Simplex completo (maximizar/minimizar, ≤ ≥ =, Gran M) + Dual + Sensibilidad y precios sombra (salen de la tabla final) |
-| Lenguaje de sensibilidad (de clase) | Holgura > 0 → recurso sobra, precio sombra 0. Holgura = 0 → restricción activa / cuello de botella. **Rango de optimalidad** (cⱼ) y **rango de factibilidad** (bᵢ). Dualidad débil, fuerte (Z* = W*) y holguras complementarias. Mostrar tabla "Restricción · Uso/Disponible · Holgura · Precio sombra · Lectura" |
+| Alcance (CERRADO, 21 oct) | **Solo Simplex con Gran M** (maximizar/minimizar, ≤ ≥ =, casos especiales). El enunciado pide un solo tema y Simplex está completo. **No se construyen** la gráfica (4b), el Dual, la Sensibilidad ni Transporte; la interfaz no los menciona |
+| Lenguaje de sensibilidad (de clase; fuera del alcance) | Holgura > 0 → recurso sobra, precio sombra 0. Holgura = 0 → restricción activa / cuello de botella. **Rango de optimalidad** (cⱼ) y **rango de factibilidad** (bᵢ). Dualidad débil, fuerte (Z* = W*) y holguras complementarias. Mostrar tabla "Restricción · Uso/Disponible · Holgura · Precio sombra · Lectura" |
 | Ejemplos de prueba obligatorios | 1) Máx Z = 40x₁ + 30x₂; 2x₁ + x₂ ≤ 40; 3x₁ + 4x₂ ≤ 120 → x₁ = 8, x₂ = 24, Z = 1040. 2) Taller: Máx Z = 40x₁ + 30x₂; 2x₁ + x₂ ≤ 100; x₁ + x₂ ≤ 80; x₂ ≤ 40 → x₁ = 30, x₂ = 40, Z = 2400; precios sombra 20, 0, 10; rango de horas máquina hasta 120 |
-| Alcance extra | Transporte (Esquina Noroeste, Costo Mínimo, Vogel + optimización MODI) solo si el núcleo está terminado antes del 22 oct |
+| Alcance extra | Descartado: Transporte no se implementa (alcance cerrado en Simplex) |
 | Stack | React + Vite + TypeScript, Tailwind CSS, KaTeX (fórmulas), fraction.js (fracciones exactas), javascript-lp-solver (verificación), Vitest (pruebas) |
 | Hosting | GitHub (repositorio público) + Vercel (deploy automático gratis) |
 | Presentación | Google Slides o Canva, con link a la app y al repositorio |
 | Idioma | La interfaz va en **español**; el código (nombres, comentarios), en **inglés** |
 | Paleta "Macaron" (valores de la 4c) | Pares fondo pastel / acento por operación: **Selección (entra/sale)** `#C4F0DC` / `#3A9D75` · **Pivote a 1** `#CFE2FF` / `#4B7FE0` · **Hacer cero** `#FFD9BF` / `#E0803F` · **Fila Z** `#E5D4FF` / `#8A5CD6` · **Errores del editor** `#FFDBDE` / `#D9505E` (acentos un poco más oscuros que en la 4a, tomados del boceto, por contraste). En Pizarra: `#1F3B31`/`#6FD3A6` · `#22324F`/`#8EB2F5` · `#45301F`/`#F2A774` · `#352B4D`/`#C0A2F2` · `#4A2328`/`#F08A94`. El pastel va de fondo (fila que cambia, segmento, franja de la ecuación); el acento solo en bordes, subrayados y marcas |
 | Paso a paso (4c) | **Una operación por paso** (entra, sale, pivote a 1, cada "hacer cero", fila Z). Sin botón "Reproducir". Arriba, nota "Iteración n" + título + explicación. Debajo, **ecuación viva**: franja con el color de la operación con la regla del paso (mín de la fila Z, mín de razones, "R2 ← R2 − 3 · R1"); al pasar el mouse por una celda de la fila que cambió se llena con sus números ("60 = 120 − 3 × 20", valor viejo tachado). Reemplaza al tooltip. **Línea de tiempo arrastrable** bajo la tabla (segmentos con el color de cada operación, agrupados por iteración, indicador con el nombre del paso) en lugar de Anterior/Siguiente, contador y barra; flechas, Inicio y Fin siguen funcionando, también con el dedo. **Movimiento con significado** (solo al avanzar un paso): en "pivote a 1" la variable que entra viaja del encabezado de su columna a la columna Base y la que sale se desvanece; en cada "hacer cero" una franja del color del pivote viaja de la fila pivote a la que cambia antes de que cambien los números. Valores viejos tachados, NumberFlow, Rough Notation y **bitácora** a la derecha |
-| Referencia visual (4c) | `docs/boceto-estilo.html` es la referencia de estilo y comportamiento; reemplaza a `docs/boceto-paso-a-paso.html` en lo visual. Su gráfica se implementa en la 4b con Mafs (la columna derecha queda lista para ella) |
+| Referencia visual (4c) | `docs/boceto-estilo.html` es la referencia de estilo y comportamiento; reemplaza a `docs/boceto-paso-a-paso.html` en lo visual. Su gráfica no se implementa (alcance cerrado); la columna derecha queda solo con la bitácora |
 | Librerías de UI aprobadas | motion, @number-flow/react, rough-notation, mafs, cmdk, sileo y Count Up de React Bits. (Spotlight Card y Dot Grid se eliminaron en la 4c) |
 | Estilo | Muy profesional, con animaciones y efectos de mouse sobrios. **Prohibido:** degradados llamativos, neón, glassmorphism/blur, auroras, sombras grandes, emojis |
-| Tipografía (4c) | **KaTeX_Main** (la fuente de LaTeX, incluida con katex) para títulos, números de la tabla, ecuaciones y bitácora; variables en **KaTeX_Math** cursiva con subíndice (x₁, S₂), como en un libro. Interfaz en **Schibsted Grotesk**; editor en **Fragment Mono** (ambas con @fontsource). Ya no se usan IBM Plex Sans ni Mono |
-| Temas (4c) | **Papel** (predeterminado, `#F4EEE2`), **Blanco** (`#FFFFFF`), **Sepia** (`#ECE0C8`) y **Pizarra** (oscuro, `#1A1C20`), con los valores de `docs/boceto-estilo.html`. Selector con "hojitas de papel" en el encabezado; la elección se recuerda en localStorage (con try/catch). En Pizarra se usan las versiones oscuras de Macaron |
-| Página (4c) | Una sola hoja: secciones numeradas "1 Modelo" y "2 Solución" separadas por líneas finas ("Resolver" llena la 2 y baja hasta ella). Fondo con grano de papel sutil (ruido SVG), sin cuadrícula ni puntos. Margen de cuaderno (doble línea rosada) a la izquierda, oculto en celular. Sin tarjetas con sombra ni esquinas muy redondeadas |
+| Tipografía (4c) | **KaTeX_Main** (la fuente de LaTeX, incluida con katex) para títulos, números de la tabla, ecuaciones y bitácora; variables en **KaTeX_Math** cursiva con subíndice (x₁, S₂), como en un libro. Interfaz en **Schibsted Grotesk**; editor de texto en **Fragment Mono** (ambas con @fontsource; el monoespaciado se usa solo ahí: las celdas de la tabla de entrada van en KaTeX_Main con cifras tabulares). Ya no se usan IBM Plex Sans ni Mono |
+| Temas (4c) | **Papel** (predeterminado, `#F0EFEB`, hueso neutro; en la etapa 7 se quitó el crema amarillento `#F4EEE2` porque se lee como paleta de IA), **Blanco** (`#FFFFFF`), **Sepia** (`#ECE0C8`) y **Pizarra** (oscuro, `#1A1C20`), con los valores de `docs/boceto-estilo.html`. Selector con "hojitas de papel" en el encabezado; la elección se recuerda en localStorage (con try/catch). En Pizarra se usan las versiones oscuras de Macaron |
+| Página (4c) | Una sola hoja: secciones "Modelo" y "Solución" (sin números desde la etapa 7: los índices se leen como plantilla) separadas por líneas finas ("Resolver" llena la 2 y baja hasta ella). Fondo con grano de papel sutil (ruido SVG), sin cuadrícula ni puntos. Margen de cuaderno (doble línea rosada) a la izquierda, oculto en celular. Sin tarjetas con sombra ni esquinas muy redondeadas |
 | Formato de números (4c) | Botón "Formato" en el encabezado que muestra un ejemplo del formato actual ("2.5" o "5/2"), en lugar de pestañas Decimales/Fracciones |
 
 ## 4. Funcionalidades (lo que lo hace original)
@@ -132,18 +132,17 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [x] Deploy en Vercel (https://holgura-pink.vercel.app)
 - [x] Simplex núcleo (max, ≤)
 - [x] Simplex: minimizar, ≥ y = (Gran M)
-- [ ] Dual
-- [ ] Sensibilidad
-- [ ] Interfaz (entrada, paso a paso y rediseño listos; faltan gráfica, dual y sensibilidad)
-- [ ] Transporte (extra)
+- [x] Alcance cerrado en Simplex con Gran M (21 oct): Dual, Sensibilidad, gráfica y Transporte descartados; se borraron sus archivos vacíos de `core/`
+- [x] Interfaz: pulido final (etapa 7)
 - [ ] Presentación
 
 ### Plan de etapas siguientes
 - [x] **4a-1** Entrada del modelo: parser (texto → modelo, errores por línea), verificación con javascript-lp-solver, pestañas Escribir/Tabla sincronizadas, vista previa KaTeX, 4 ejemplos, pantalla de resultado simple (estado, valores, Z, verificación, decimales/fracciones)
 - [x] **4a-2** Paso a paso animado: `core/steps.ts` (una operación por paso, cálculo de cada celda, textos), pantalla de solución con preparación, tabla animada (motion, NumberFlow, rough-notation), bitácora, Spotlight Card y Count Up de React Bits, tarjeta final; respeta prefers-reduced-motion
 - [x] **4c** Rediseño visual: tipografía de libro (KaTeX_Main/KaTeX_Math, Schibsted Grotesk, Fragment Mono), 4 temas de papel con selector, grano y margen de cuaderno, una sola hoja con secciones numeradas, editor con resaltado y errores ondulados, ecuación viva, línea de tiempo arrastrable, movimiento con significado (variable que entra viaja a la base, franja del pivote); se quitaron Spotlight Card y Dot Grid
-- [ ] **4b** Método gráfico con Mafs
-- [ ] **5** Dual y sensibilidad
-- [ ] **6** Pulido: Ctrl + K (cmdk), avisos (sileo), link compartible, README
+- [-] ~~**4b** Método gráfico con Mafs~~ (descartada: alcance cerrado)
+- [-] ~~**5** Dual y sensibilidad~~ (descartada: alcance cerrado)
+- [x] **7** Pulido final del frontend: auditoría con taste-skill, web-design-guidelines y Playwright (capturas a 1440 y 390 px, 4 temas, 4 ejemplos). Además: vista previa bajo el editor, tarjeta final sin repetir el último paso, etiquetas sin mayúsculas espaciadas, "Iteración n" a la derecha del título, foco visible y flechas en las pestañas, favicon
+- [ ] **8** README y presentación
 
 > Mynor: actualiza esta sección (o pégale a Claude el estado) al empezar cada conversación nueva.

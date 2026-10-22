@@ -93,38 +93,41 @@ export function ModelSection({
             </div>
           )}
 
-          <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
-            {!canSolve && (
-              <span className="mr-auto text-[13px] text-muted">
-                {tab === 'table' && tableInvalid
-                  ? 'Hay celdas que no son números.'
-                  : `Corrige ${parsed.errors.length === 1 ? 'el error' : 'los errores'} para resolver.`}
-              </span>
-            )}
-            <button type="button" className="btn btn-primary" disabled={!canSolve} onClick={onSolve}>
-              Resolver
-            </button>
+          {/* Vista previa y Resolver comparten fila: se lee el modelo y se resuelve desde el mismo lugar. */}
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-t border-rule pt-4">
+            <section aria-labelledby="vista-previa" className="min-w-0 flex-1 basis-[260px]">
+              <div className="flex items-baseline gap-3">
+                <h3 id="vista-previa" className="kicker">
+                  Vista previa
+                </h3>
+                {hasErrors && previewModel && <span className="text-xs text-muted">Último modelo válido</span>}
+              </div>
+              {previewModel ? (
+                <ModelPreview
+                  model={previewModel}
+                  className={`model-preview text-[16px] transition-opacity duration-200 ${hasErrors ? 'opacity-40' : ''}`}
+                />
+              ) : (
+                <p className="mt-3 text-[13px] text-muted">El modelo aparecerá aquí con notación matemática.</p>
+              )}
+            </section>
+
+            <div className="flex flex-col items-end gap-2 pb-1">
+              {!canSolve && (
+                <span className="text-right text-[13px] text-err-ink" role="status">
+                  {tab === 'table' && tableInvalid
+                    ? 'Hay celdas que no son números.'
+                    : `Corrige ${parsed.errors.length === 1 ? 'el error' : 'los errores'} para resolver.`}
+                </span>
+              )}
+              <button type="button" className="btn btn-primary" disabled={!canSolve} onClick={onSolve}>
+                Resolver
+              </button>
+            </div>
           </div>
         </div>
 
-        <aside className="flex min-w-0 flex-col gap-6">
-          <section aria-labelledby="vista-previa">
-            <div className="flex items-baseline justify-between">
-              <h3 id="vista-previa" className="kicker">
-                Vista previa
-              </h3>
-              {hasErrors && previewModel && <span className="text-[11px] text-muted">Último modelo válido</span>}
-            </div>
-            {previewModel ? (
-              <ModelPreview
-                model={previewModel}
-                className={`text-[15px] transition-opacity duration-200 ${hasErrors ? 'opacity-40' : ''}`}
-              />
-            ) : (
-              <p className="mt-3 text-[13px] text-muted">El modelo aparecerá aquí con notación matemática.</p>
-            )}
-          </section>
-
+        <aside className="min-w-0">
           <ExampleGallery activeId={activeExampleId} onSelect={onSelectExample} />
         </aside>
       </div>
