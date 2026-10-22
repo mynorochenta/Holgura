@@ -7,10 +7,10 @@ import { useEffect, useState } from 'react'
 export type Theme = 'papel' | 'blanco' | 'sepia' | 'pizarra'
 
 export const THEMES: { id: Theme; label: string; swatch: string }[] = [
-  { id: 'papel', label: 'Papel', swatch: '#F0EFEB' },
+  { id: 'papel', label: 'Papel', swatch: '#F1F0EC' },
   { id: 'blanco', label: 'Blanco', swatch: '#FFFFFF' },
   { id: 'sepia', label: 'Sepia', swatch: '#ECE0C8' },
-  { id: 'pizarra', label: 'Pizarra', swatch: '#1A1C20' },
+  { id: 'pizarra', label: 'Pizarra', swatch: '#17191C' },
 ]
 
 const STORAGE_KEY = 'holgura-tema'

@@ -176,7 +176,7 @@
     transform 0.2s var(--ease-out);
 }
 .compact .plate-thumb {
-  width: 64px;
+  width: 92px;
 }
 .plate-thumb:hover {
   border-color: var(--ink);
@@ -236,12 +236,59 @@
   align-items: center;
   gap: 7px;
 }
+.plate-legend .plate-hint {
+  display: none;
+  margin-left: auto;
+}
+@media (min-width: 640px) {
+  .plate-legend .plate-hint {
+    display: inline;
+  }
+}
 .plate-legend i {
   width: 14px;
   height: 6px;
 }
 
 /* ---------- Lámina: ecuación del paso y tabla Simplex ---------- */
+/* Comparando: la lámina muestra el paso anterior; el borde punteado avisa que no es el actual. */
+.plate.comparing {
+  border-style: dashed;
+  border-color: var(--muted);
+}
+.plate-compare {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.plate-compare:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.plate-compare:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+kbd {
+  display: none;
+  min-width: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--bg);
+  font: 500 12px/18px var(--f-ui);
+  text-align: center;
+  color: var(--muted);
+}
+@media (min-width: 640px) {
+  kbd {
+    display: inline-block;
+  }
+}
 .plate {
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -249,6 +296,8 @@
 }
 .plate-foot {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 10px 20px 12px;
@@ -347,6 +396,17 @@
 .tableau th:first-child,
 .tableau td:first-child {
   text-align: left;
+}
+/* La columna Base queda fija al desplazar la tabla de lado (en celular). */
+.tableau th:first-child,
+.tableau td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--paper);
+}
+.tableau tr.marked td:first-child {
+  background: color-mix(in srgb, var(--c) var(--tint), var(--paper));
 }
 .tableau .rhs {
   border-left: 1px solid var(--line);

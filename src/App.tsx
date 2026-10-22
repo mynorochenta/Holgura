@@ -11,6 +11,14 @@ import { SolutionSection } from './pages/SolutionSection'
 
 const FIRST_EXAMPLE = EXAMPLES[0]
 
+interface Solved {
+  model: LinearModel
+  text: string
+  key: number
+  /** Ejemplo resuelto, si el texto es exactamente el de uno: da la lectura de la solución. */
+  example?: Example
+}
+
 function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
@@ -22,7 +30,13 @@ function App() {
   const [tab, setTab] = useState<InputTab>('text')
   const [activeExampleId, setActiveExampleId] = useState<string | null>(FIRST_EXAMPLE.id)
   const [tableKey, setTableKey] = useState(0)
-  const [solved, setSolved] = useState<{ model: LinearModel; text: string; key: number } | null>(null)
+  // Al abrir, el primer ejemplo ya está resuelto: la solución paso a paso se ve desde el principio.
+  const [solved, setSolved] = useState<Solved | null>(() => ({
+    model: parseModel(FIRST_EXAMPLE.text).model!,
+    text: FIRST_EXAMPLE.text,
+    key: 0,
+    example: FIRST_EXAMPLE,
+  }))
   const [format, setFormat] = useState<NumberFormat>('decimal')
   const solutionRef = useRef<HTMLElement>(null)
 
@@ -36,20 +50,29 @@ function App() {
     setActiveExampleId(example?.id ?? null)
   }
 
+  function solveText(source: string) {
+    const model = parseModel(source).model
+    if (!model) return
+    const example = EXAMPLES.find((e) => e.text === source)
+    setSolved((prev) => ({ model, text: source, key: (prev?.key ?? 0) + 1, example }))
+  }
+
+  /** Un ejemplo se carga y se resuelve de inmediato: su modelo siempre es válido. */
   function selectExample(example: Example) {
     changeText(example.text)
     setTableKey((k) => k + 1)
+    solveText(example.text)
   }
 
   function solve() {
-    if (!parsed.model) return
-    setSolved((prev) => ({ model: parsed.model!, text, key: (prev?.key ?? 0) + 1 }))
+    solveText(text)
   }
 
   // Al resolver, baja hasta la solución.
+  // (La solución inicial, key 0, no mueve la página.)
   const solvedKey = solved?.key
   useEffect(() => {
-    if (solvedKey === undefined) return
+    if (!solvedKey) return
     solutionRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
   }, [solvedKey])
 
@@ -76,6 +99,7 @@ function App() {
             key={solved.key}
             ref={solutionRef}
             model={solved.model}
+            example={solved.example}
             format={format}
             theme={theme}
             stale={stale}

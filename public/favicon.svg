@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="3" fill="#f0efeb"/>
-  <path d="M7 0v32M9 0v32" stroke="#e09aa4" stroke-width="1"/>
-  <text x="19.5" y="23.5" font-family="Georgia, 'Times New Roman', serif" font-size="21" text-anchor="middle" fill="#23221f">H</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+  <rect x="0.5" y="0.5" width="29" height="29" rx="2" fill="#ffffff" stroke="#d9d6ce"/>
+  <g fill="#ebe9e3">
+    <rect x="5" y="5.5" width="4.25" height="3"/><rect x="10.25" y="5.5" width="4.25" height="3"/><rect x="15.5" y="5.5" width="4.25" height="3"/><rect x="20.75" y="5.5" width="4.25" height="3"/>
+    <rect x="5" y="15.5" width="4.25" height="3"/><rect x="10.25" y="15.5" width="4.25" height="3"/><rect x="15.5" y="15.5" width="4.25" height="3"/><rect x="20.75" y="15.5" width="4.25" height="3"/>
+    <rect x="5" y="20.5" width="4.25" height="3"/><rect x="10.25" y="20.5" width="4.25" height="3"/><rect x="15.5" y="20.5" width="4.25" height="3"/><rect x="20.75" y="20.5" width="4.25" height="3"/>
+  </g>
+  <g fill="#2d5da8">
+    <rect x="5" y="10.5" width="4.25" height="3"/><rect x="10.25" y="10.5" width="4.25" height="3"/><rect x="15.5" y="10.5" width="4.25" height="3"/><rect x="20.75" y="10.5" width="4.25" height="3"/>
+  </g>
 </svg>

@@ -13,9 +13,13 @@ import type { LinearModel } from '../core/model'
 import { solveSimplex } from '../core/simplex'
 import { buildSteps, describeStep } from '../core/steps'
 import { verify } from '../core/verify'
+import type { Example } from '../examples'
+import { readSolution } from '../examples/reading'
 
 interface SolutionSectionProps {
   model: LinearModel
+  /** Ejemplo resuelto, para leer la solución en el lenguaje de su historia. */
+  example?: Example
   format: NumberFormat
   theme: string
   /** El texto del modelo cambió después de resolver. */
@@ -34,9 +38,9 @@ function isTyping(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
 }
 
-/** Sección 2: preparación, paso a paso con la tabla, línea de tiempo, bitácora y resultado. */
+/** Sección 2: tira de láminas, la lámina del paso (con comparación), modelo y preparación, y resultado. */
 export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(function SolutionSection(
-  { model, format, theme, stale, canResolve, onResolve },
+  { model, example, format, theme, stale, canResolve, onResolve },
   ref,
 ) {
   const reduce = useReducedMotion()
@@ -52,6 +56,8 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
   // Paso actual y cómo se llegó a él (se actualizan juntos).
   const [view, setView] = useState<{ current: number; navigation: Navigation }>({ current: 0, navigation: 'jump' })
   const [hoverColumn, setHoverColumn] = useState<number | null>(null)
+  // Comparar: la lámina muestra la tabla del paso anterior mientras está activo.
+  const [comparing, setComparing] = useState(false)
   const total = outcome.steps.length
   const { current, navigation } = view
 
@@ -65,6 +71,7 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
         return { current: next, navigation: how ?? (next === prev.current + 1 ? 'step' : 'jump') }
       })
       setHoverColumn(null)
+      setComparing(false)
     },
     [total],
   )
@@ -76,6 +83,7 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
       else if (event.key === 'ArrowLeft') go({ delta: -1 })
       else if (event.key === 'Home') go({ index: 0 })
       else if (event.key === 'End') go({ index: total - 1 })
+      else if (event.key === 'c' || event.key === 'C') setComparing((on) => !on)
       else return
       event.preventDefault()
     }
@@ -87,9 +95,12 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
   const texts = useMemo(() => (result ? steps.map((s) => describeStep(s, result, format)) : []), [steps, result, format])
   const tones = useMemo(() => (result ? steps.map((s) => stepTone(s, result)) : []), [steps, result])
 
-  const step = steps[current]
-  const tone = tones[current] ?? 'sel'
+  // Al comparar, la lámina muestra el paso anterior (sin movimiento) y el texto sigue en el actual.
+  const showing = comparing && current > 0 ? current - 1 : current
+  const step = steps[showing]
+  const tone = tones[showing] ?? 'sel'
   const text = texts[current]
+  const reading = useMemo(() => (example && result ? readSolution(example.reading, result) : null), [example, result])
   const atEnd = current === total - 1
   const meaningfulMotion = !reduce && navigation === 'step'
   const animateValues = !reduce && navigation !== 'drag'
@@ -131,21 +142,34 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
                   </p>
                 </div>
 
-                <div className="plate">
+                <div className={comparing && current > 0 ? 'plate comparing' : 'plate'}>
                   <LiveEquation step={step} result={result} format={format} column={hoverColumn} />
                   <TableauView
                     step={step}
                     result={result}
                     format={format}
                     tone={tone}
-                    meaningfulMotion={meaningfulMotion}
-                    animateValues={animateValues}
+                    meaningfulMotion={meaningfulMotion && !comparing}
+                    animateValues={animateValues && !comparing}
                     theme={theme}
                     onHoverColumn={setHoverColumn}
                   />
                   <div className="plate-foot">
-                    <span>Los valores tachados son los de la lámina anterior.</span>
-                    <span className="hidden sm:inline">← → para avanzar</span>
+                    <span aria-live="polite">
+                      {comparing && current > 0
+                        ? `Estás viendo la lámina ${current}, la anterior.`
+                        : 'Los valores tachados son los de la lámina anterior.'}
+                    </span>
+                    <button
+                      type="button"
+                      className="plate-compare"
+                      aria-pressed={comparing}
+                      disabled={current === 0}
+                      onClick={() => setComparing((on) => !on)}
+                    >
+                      {comparing ? 'Volver a la lámina actual' : 'Comparar con la anterior'}
+                      <kbd>C</kbd>
+                    </button>
                   </div>
                 </div>
 
@@ -159,7 +183,7 @@ export const SolutionSection = forwardRef<HTMLElement, SolutionSectionProps>(fun
                       exit={reduce ? undefined : { opacity: 0, y: 6, transition: { duration: 0.15 } }}
                       transition={{ duration: reduce ? 0 : 0.45, ease: [0.2, 0.8, 0.2, 1] }}
                     >
-                      <ResultSummary result={result} verification={verification} format={format} />
+                      <ResultSummary result={result} verification={verification} format={format} reading={reading} />
                     </motion.div>
                   )}
                 </AnimatePresence>
