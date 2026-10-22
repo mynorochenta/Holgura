@@ -147,6 +147,7 @@ Principio clave: **`core/` no sabe que existe React**. Esto se explica en la pre
 - [-] ~~**5** Dual y sensibilidad~~ (descartada: alcance cerrado)
 - [x] **7** Pulido final del frontend: auditoría con taste-skill, web-design-guidelines y Playwright (capturas a 1440 y 390 px, 4 temas, 4 ejemplos). Además: vista previa bajo el editor, tarjeta final sin repetir el último paso, etiquetas sin mayúsculas espaciadas, "Iteración n" a la derecha del título, foco visible y flechas en las pestañas, favicon
 - [x] **Rediseño** (rama `rediseno`, 21 oct): auditoría con impeccable, avoid-ai-design, taste-skill y web-design-guidelines; mundo Láminas en secuencia elegido por Mynor; PRODUCT.md y DESIGN.md. Pendiente: aprobación de Mynor para fusionar a main
-- [ ] **8** README y presentación
+- [x] **8a** README con capturas (Playwright, `docs/capturas/`)
+- [ ] **8b** Presentación (Google Slides o Canva, con link a la app y al repo)
 
 > Mynor: actualiza esta sección (o pégale a Claude el estado) al empezar cada conversación nueva.
