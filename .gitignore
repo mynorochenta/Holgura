@@ -30,3 +30,8 @@ dist-ssr
 coverage
 .vercel
 .claude/
+
+# Bocetos y capturas de impeccable (trabajo de diseño, no se publican)
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/questions/

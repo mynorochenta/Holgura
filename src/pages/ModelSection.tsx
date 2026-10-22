@@ -58,7 +58,7 @@ export function ModelSection({
 
   return (
     <Section number={1} title="Modelo" note="Simplex con Gran M para ≥ y =, verificado con un solver independiente">
-      <div className="grid gap-x-9 gap-y-7 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div
           className="min-w-0"
           onKeyDown={(e) => {
@@ -85,7 +85,7 @@ export function ModelSection({
             <TableEditor key={tableKey} initialModel={parsed.model} onChange={handleTableChange} />
           )}
           {tableBlocked && (
-            <div className="border-l-[3px] border-err bg-err-t/50 px-4 py-3 text-sm">
+            <div className="notice-error text-[15px]">
               <p>El texto tiene errores, así que la tabla no se puede llenar todavía.</p>
               <button type="button" className="btn mt-2.5" onClick={() => handleTabChange('text')}>
                 Ver los errores en Escribir
@@ -97,7 +97,7 @@ export function ModelSection({
           <div className="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-t border-rule pt-4">
             <section aria-labelledby="vista-previa" className="min-w-0 flex-1 basis-[260px]">
               <div className="flex items-baseline gap-3">
-                <h3 id="vista-previa" className="kicker">
+                <h3 id="vista-previa" className="block-title">
                   Vista previa
                 </h3>
                 {hasErrors && previewModel && <span className="text-xs text-muted">Último modelo válido</span>}

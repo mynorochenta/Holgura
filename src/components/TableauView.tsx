@@ -30,7 +30,6 @@ interface Highlights {
   rows: Map<StepRow, Tone>
   pivot: { row: number; column: number } | null
   underlineColumn: number | null
-  boxRows: Set<number>
   circlePivot: boolean
 }
 
@@ -41,7 +40,6 @@ function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlight
     rows: new Map(),
     pivot: null,
     underlineColumn: null,
-    boxRows: new Set(),
     circlePivot: false,
   }
   const t = step.tableau
@@ -54,7 +52,6 @@ function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlight
       h.columns.add(step.enteringColumn!)
       h.rows.set(step.leavingRow!, 'sel')
       h.pivot = { row: step.leavingRow!, column: step.enteringColumn! }
-      h.boxRows.add(step.leavingRow!)
       break
     case 'scale':
       h.rows.set(step.changedRow!, tone)
@@ -75,7 +72,6 @@ function highlightsFor(step: Step, result: SimplexResult, tone: Tone): Highlight
         t.basis.forEach((column, i) => {
           if (result.infeasibleArtificials?.includes(t.variables[column])) {
             h.rows.set(i, 'error')
-            h.boxRows.add(i)
           }
         })
       }
@@ -247,7 +243,6 @@ export function TableauView({
         data-row={String(row)}
         className={className}
         style={style}
-        data-rough={!isZ && h.boxRows.has(row) ? 'box' : undefined}
         data-rough-color={toneVars(rowTone ?? tone).accent}
       >
         <td className="basis">

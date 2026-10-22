@@ -19,23 +19,23 @@ export function PreparationCard({
   const adjustment = result?.bigMAdjustment ?? null
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-9 gap-y-5 border-b border-rule pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <div className="flex flex-col gap-6">
       <section aria-labelledby="modelo-resuelto" className="min-w-0">
-        <h3 id="modelo-resuelto" className="kicker">
+        <h3 id="modelo-resuelto" className="block-title">
           Modelo
         </h3>
-        <ModelPreview model={model} className="text-[15px]" />
+        <ModelPreview model={model} className="model-preview text-[16px]" />
       </section>
 
       {result && (
-        <section aria-labelledby="preparacion" className="min-w-0 md:border-l md:border-rule md:pl-9">
-          <h3 id="preparacion" className="kicker">
+        <section aria-labelledby="preparacion" className="min-w-0 border-t border-rule pt-5">
+          <h3 id="preparacion" className="block-title">
             Preparación
           </h3>
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-2 space-y-1.5 text-[15px]">
             {result.preparation.map((step, i) => (
               <li key={i} className="flex gap-2.5">
-                <span className="mt-[9px] h-[1.5px] w-2 shrink-0 bg-muted" />
+                <span aria-hidden className="mt-[11px] h-px w-2.5 shrink-0 bg-muted" />
                 <span>
                   <MathText text={describePreparationStep(step, format)} />
                 </span>
@@ -43,7 +43,7 @@ export function PreparationCard({
             ))}
           </ul>
 
-          <dl className="mt-3.5 space-y-2 border-t border-rule pt-3 text-[13px]">
+          <dl className="mt-4 space-y-3 text-[14px]">
             <div>
               <dt className="text-muted">Fila Z inicial</dt>
               <dd className="mt-0.5 overflow-x-auto font-display text-[16px] whitespace-nowrap">
@@ -58,7 +58,7 @@ export function PreparationCard({
                     <MathText text={adjustment.operations.map((op) => describeOperation(op, format)).join(' · ')} />
                   </span>
                 </dt>
-                <dd className="mt-1 overflow-x-auto border-l-[3px] border-zeta bg-zeta-t/60 px-2.5 py-1 font-display text-[16px] whitespace-nowrap">
+                <dd className="mt-1 overflow-x-auto rounded-[3px] bg-zeta-t px-2.5 py-1.5 font-display text-[16px] whitespace-nowrap text-zeta-ink">
                   <MathText text={formatObjectiveRow(adjustment.after, lhs, format)} />
                 </dd>
               </div>

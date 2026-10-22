@@ -13,12 +13,12 @@ interface HeaderProps {
 export function Header({ format, onFormatChange, theme, onThemeChange }: HeaderProps) {
   const next = format === 'decimal' ? 'fraction' : 'decimal'
   return (
-    <header className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-4 px-4 pt-5 pb-3.5 sm:px-7 sm:pt-6">
+    <header className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-4 px-4 pt-6 pb-5 sm:px-10">
       <div>
         <h1 className="font-display text-[25px] leading-none tracking-[-0.01em] sm:text-[29px]">Holgura</h1>
-        <p className="mt-1.5 text-xs tracking-[0.02em] text-muted">Programación lineal, paso a paso</p>
+        <p className="mt-1.5 text-[14px] text-muted">Programación lineal, paso a paso</p>
       </div>
-      <div className="flex items-center gap-4 text-xs text-muted sm:gap-5">
+      <div className="flex items-center gap-4 text-[13px] text-muted sm:gap-6">
         <a
           href={REPOSITORY_URL}
           target="_blank"
@@ -29,7 +29,7 @@ export function Header({ format, onFormatChange, theme, onThemeChange }: HeaderP
         </a>
         <button
           type="button"
-          className="btn gap-2 px-2.5 py-1 text-xs"
+          className="btn min-h-9 gap-2 px-3 text-[13px]"
           onClick={() => onFormatChange(next)}
           title={format === 'decimal' ? 'Ver los números en fracciones' : 'Ver los números en decimales'}
           aria-label={`Formato de los números: ${format === 'decimal' ? 'decimales' : 'fracciones'}. Cambiar a ${format === 'decimal' ? 'fracciones' : 'decimales'}`}
