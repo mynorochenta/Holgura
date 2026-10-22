@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { formatNumber, type Fraction, type NumberFormat } from '../core/fraction'
 import type { SimplexResult } from '../core/simplex'
 import type { Verification } from '../core/verify'
+import type { SolutionReading } from '../examples/reading'
 import { MathText, Var } from './MathText'
 import { resultTone, toneStyle } from './tone'
 
@@ -100,10 +101,13 @@ export function ResultSummary({
   result,
   verification,
   format,
+  reading,
 }: {
   result: SimplexResult
   verification: Verification
   format: NumberFormat
+  /** Lectura en el lenguaje del ejemplo, si el modelo resuelto es uno de ellos. */
+  reading?: SolutionReading | null
 }) {
   const tone = resultTone(result)
   const variables = result.finalTableau.variables
@@ -124,6 +128,19 @@ export function ResultSummary({
         </h3>
         {solved && <span className="text-[13px] text-muted">{iterationsText(result.iterations.length)}</span>}
       </div>
+
+      {reading && (
+        <div className="mt-3 max-w-[64ch]">
+          <p className="text-[18px] leading-snug text-ink">{reading.headline}</p>
+          {reading.details.length > 0 && (
+            <ul className="mt-2 space-y-0.5 text-[15px] text-muted">
+              {reading.details.map((detail) => (
+                <li key={detail}>{detail}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {solved && (
         <>

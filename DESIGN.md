@@ -24,7 +24,9 @@ Tintas por operación (claras / Pizarra): selección `#2F7D4F` / `#6CC896`, pivo
 
 ## Componentes
 
-- **Tira de láminas** (`PlateStrip`): miniatura de la tabla por paso, agrupada por iteración; la operación entinta su fila, su columna o el pivote. Es la única navegación del paso a paso: clic, ← →, Inicio/Fin, arrastre con el mouse y deslizamiento táctil. Con más de 16 pasos se compacta (solo el número).
+- **Tira de láminas** (`PlateStrip`): miniatura de la tabla por paso, agrupada por iteración; la operación entinta su fila, su columna o el pivote. Es la única navegación del paso a paso: clic, ← →, Inicio/Fin, arrastre con el mouse y deslizamiento táctil. Con más de 16 pasos las miniaturas se angostan y su pie se recorta con puntos suspensivos.
+- **Marca**: lámina en miniatura de 4×4 celdas con la segunda fila en la tinta del pivote (encabezado y favicon).
+- **Comparar** (`.plate.comparing`): la lámina muestra el paso anterior con borde punteado; botón en el pie y tecla C.
 - **Lámina** (`.plate`): ecuación del paso (franja con el tinte de la operación), tabla y pie. Borde de 1 px, radio 3 px, sin sombra.
 - **Botones**: alto mínimo 40 px, radio 3 px; el primario es tinta sólida. Íconos dibujados en SVG, nunca glifos de texto.
 - **Avisos de error**: tinte de error de fondo, sin franja lateral.

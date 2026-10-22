@@ -157,7 +157,7 @@ export function PlateStrip({ steps, texts, tones, result, current, onGo }: Plate
                       <Thumbnail step={steps[i]} marks={marksFor(steps[i], result)} />
                       <span className="plate-caption">
                         <span className="plate-number">{i + 1}</span>
-                        {!compact && <span className="truncate">{subscript(caption(texts[i].title))}</span>}
+                        <span className="truncate">{subscript(caption(texts[i].title))}</span>
                       </span>
                     </button>
                   </li>
@@ -174,7 +174,7 @@ export function PlateStrip({ steps, texts, tones, result, current, onGo }: Plate
             {label}
           </span>
         ))}
-        <span className="ml-auto hidden sm:inline">← → para avanzar · Inicio y Fin</span>
+        <span className="plate-hint">← → para avanzar · Inicio y Fin · C compara</span>
       </div>
     </nav>
   )
