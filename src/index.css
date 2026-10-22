@@ -1,93 +1,88 @@
 @import 'tailwindcss';
 
-@import '@fontsource/schibsted-grotesk/400.css';
-@import '@fontsource/schibsted-grotesk/500.css';
-@import '@fontsource/schibsted-grotesk/600.css';
+@import '@fontsource/work-sans/400.css';
+@import '@fontsource/work-sans/500.css';
+@import '@fontsource/work-sans/600.css';
 @import '@fontsource/fragment-mono/400.css';
 @import 'katex/dist/katex.min.css';
 
 /*
- * Temas: Papel (predeterminado), Blanco, Sepia y Pizarra (oscuro). Valores de docs/boceto-estilo.html;
- * el gris "muted" se oscureció un poco en los temas claros para llegar a contraste 4.5:1.
+ * Mundo "Láminas en secuencia": cada tabla es una lámina blanca a escala fija sobre un fondo apenas
+ * tintado; el color vive en la tinta de los números que cambia cada operación, no en rellenos ni
+ * franjas laterales. Cuatro temas: Papel (predeterminado), Blanco, Sepia y Pizarra (oscuro).
  *
- * Paleta "Macaron": pares pastel / acento por tipo de operación. El pastel va de fondo; el acento,
- * en bordes y marcas. Para texto de color se usa --*-ink: el acento mezclado con la tinta (contraste).
+ * Tintas por operación: selección (verde), pivote a 1 (azul), hacer cero (naranja quemado),
+ * fila Z (ciruela) y error (rojo). --*-t es un tinte muy claro de cada tinta, calculado sobre la
+ * lámina, para el fondo de una columna o fila señalada.
  */
 :root,
 [data-theme='papel'] {
-  --bg: #f0efeb;
-  --paper: #fbfbfa;
-  --ink: #23221f;
-  --muted: #625f58;
-  --line: #d8d4cb;
-  --rule: #e6e3dc;
-  --margin: #e09aa4;
-  --grain: 0.45;
-  --sel-t: #c4f0dc;
-  --sel: #3a9d75;
-  --piv-t: #cfe2ff;
-  --piv: #4b7fe0;
-  --cero-t: #ffd9bf;
-  --cero: #e0803f;
-  --zeta-t: #e5d4ff;
-  --zeta: #8a5cd6;
-  --err-t: #ffdbde;
-  --err: #d9505e;
-  --ink-mix: 55%;
+  --bg: #f1f0ec;
+  --paper: #ffffff;
+  --ink: #1e2320;
+  --muted: #605d56;
+  --line: #d9d6ce;
+  --rule: #ebe9e3;
+  --sel: #2f7d4f;
+  --piv: #2d5da8;
+  --cero: #b05510;
+  --zeta: #8a3b6e;
+  --err: #c42b3c;
+  --tint: 11%;
   color-scheme: light;
 }
 [data-theme='blanco'] {
   --bg: #ffffff;
   --paper: #ffffff;
-  --ink: #25232b;
-  --muted: #6a6672;
-  --line: #e2e0e6;
-  --rule: #eeecf1;
-  --margin: #ebb4ae;
-  --grain: 0.25;
+  --ink: #1c1e22;
+  --muted: #5d5f66;
+  --line: #dfdfe3;
+  --rule: #eeeef1;
 }
 [data-theme='sepia'] {
-  --bg: #ece0c8;
-  --paper: #f3e9d6;
-  --ink: #3a2e22;
-  --muted: #695946;
-  --line: #d2c0a0;
-  --rule: #e0d1b5;
-  --margin: #cc8e80;
-  --grain: 0.7;
+  --bg: #ece3d0;
+  --paper: #f9f4e9;
+  --ink: #33291f;
+  --muted: #64553d;
+  --line: #d3c4a6;
+  --rule: #e6dcc6;
+  --sel: #2c6e43;
+  --piv: #2b5596;
+  --cero: #a04c0c;
+  --zeta: #7d3463;
+  --err: #b42536;
 }
 [data-theme='pizarra'] {
-  --bg: #1a1c20;
-  --paper: #202328;
-  --ink: #e9e5dd;
-  --muted: #9a958c;
-  --line: #3a3d44;
-  --rule: #2d3036;
-  --margin: #7a4a47;
-  --grain: 0.35;
-  --sel-t: #1f3b31;
-  --sel: #6fd3a6;
-  --piv-t: #22324f;
-  --piv: #8eb2f5;
-  --cero-t: #45301f;
-  --cero: #f2a774;
-  --zeta-t: #352b4d;
-  --zeta: #c0a2f2;
-  --err-t: #4a2328;
-  --err: #f08a94;
-  --ink-mix: 100%;
+  --bg: #17191c;
+  --paper: #1f2226;
+  --ink: #e8e6e1;
+  --muted: #a19f99;
+  --line: #3a3e45;
+  --rule: #2b2e33;
+  --sel: #6cc896;
+  --piv: #8fb2f0;
+  --cero: #f0a262;
+  --zeta: #e294c6;
+  --err: #f4838f;
+  --tint: 16%;
   color-scheme: dark;
 }
 :root {
-  --sel-ink: color-mix(in srgb, var(--sel) var(--ink-mix), var(--ink));
-  --piv-ink: color-mix(in srgb, var(--piv) var(--ink-mix), var(--ink));
-  --cero-ink: color-mix(in srgb, var(--cero) var(--ink-mix), var(--ink));
-  --zeta-ink: color-mix(in srgb, var(--zeta) var(--ink-mix), var(--ink));
-  --err-ink: color-mix(in srgb, var(--err) var(--ink-mix), var(--ink));
-  --f-ui: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --sel-t: color-mix(in srgb, var(--sel) var(--tint), var(--paper));
+  --piv-t: color-mix(in srgb, var(--piv) var(--tint), var(--paper));
+  --cero-t: color-mix(in srgb, var(--cero) var(--tint), var(--paper));
+  --zeta-t: color-mix(in srgb, var(--zeta) var(--tint), var(--paper));
+  --err-t: color-mix(in srgb, var(--err) var(--tint), var(--paper));
+  /* Las tintas ya tienen contraste AA sobre la lámina: el texto de color las usa tal cual. */
+  --sel-ink: var(--sel);
+  --piv-ink: var(--piv);
+  --cero-ink: var(--cero);
+  --zeta-ink: var(--zeta);
+  --err-ink: var(--err);
+  --f-ui: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
   --f-mono: 'Fragment Mono', ui-monospace, monospace;
   --f-num: KaTeX_Main, 'Times New Roman', serif;
-  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @theme inline {
@@ -126,28 +121,18 @@ html {
 }
 
 body {
-  @apply min-h-screen font-sans text-[15px] leading-relaxed text-ink antialiased;
-}
-
-/* Grano de papel: ruido SVG fijo sobre toda la página. */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: var(--noise);
-  opacity: var(--grain);
-  mix-blend-mode: multiply;
-  z-index: 50;
-}
-[data-theme='pizarra'] body::after {
-  mix-blend-mode: screen;
-  filter: invert(1);
+  @apply min-h-screen font-sans text-[16px] leading-relaxed text-ink antialiased;
 }
 
 ::selection {
   background: var(--piv-t);
   color: var(--ink);
+}
+
+/* Barras de desplazamiento con los colores del tema. */
+* {
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
 }
 
 /* Variable matemática: letra en cursiva de LaTeX y subíndice en la romana. */
@@ -163,35 +148,18 @@ body::after {
 }
 
 @layer components {
-  /* Hoja con margen de cuaderno (doble línea rosada), oculto en celular. */
+  /* La hoja: una columna ancha con márgenes iguales. */
   .sheet {
-    @apply relative mx-auto mb-16 max-w-[1200px] px-4 sm:px-7;
-  }
-  .sheet::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    border-left: 1px solid var(--margin);
-    border-right: 1px solid var(--margin);
-    opacity: 0.55;
-    display: none;
-  }
-  @media (min-width: 640px) {
-    .sheet::before {
-      display: block;
-    }
+    @apply relative mx-auto mb-20 max-w-[1320px] px-4 sm:px-10;
   }
 
-  /* Etiqueta de bloque: en minúsculas y legible, sin versalitas espaciadas. */
-  .kicker {
-    @apply text-[13px] font-medium text-muted;
+  /* Título de un bloque (no una etiqueta encima de otro título). */
+  .block-title {
+    @apply text-[15px] font-semibold text-ink;
   }
 
   .btn {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[2px] border border-line bg-transparent px-3 py-1.5 text-[13px] text-ink;
+    @apply inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-[3px] border border-line bg-paper px-4 text-[14px] font-medium text-ink;
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease,
@@ -204,17 +172,17 @@ body::after {
     transform: scale(0.97);
   }
   .btn:disabled {
-    @apply cursor-not-allowed opacity-40;
+    @apply cursor-not-allowed border-rule bg-rule text-muted;
   }
   .btn-primary {
-    @apply border-ink bg-ink px-5 text-paper;
+    @apply border-ink bg-ink px-6 text-[15px] text-paper;
   }
   .btn-primary:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--ink) 88%, var(--paper));
+    background: color-mix(in srgb, var(--ink) 86%, var(--paper));
   }
 
   .field {
-    @apply w-full rounded-[2px] border border-line bg-paper px-2 py-1 text-right font-display text-[15px] text-ink tabular-nums;
+    @apply w-full rounded-[3px] border border-line bg-paper px-2 py-1.5 text-right font-display text-[16px] text-ink tabular-nums;
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
@@ -224,10 +192,15 @@ body::after {
   }
   .field:focus {
     @apply border-piv outline-none;
-    box-shadow: 0 0 0 2px var(--piv-t);
+    box-shadow: 0 0 0 3px var(--piv-t);
   }
   .field[aria-invalid='true'] {
     @apply border-err bg-err-t;
+  }
+
+  /* Aviso dentro de un bloque: tinte del color, sin franja lateral. */
+  .notice-error {
+    @apply rounded-[3px] bg-err-t px-4 py-3;
   }
 }
 
@@ -247,7 +220,7 @@ select {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(3px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -255,15 +228,18 @@ select {
   }
 }
 .fade-up {
-  animation: fade-up 0.35s ease both;
+  animation: fade-up 0.35s var(--ease-out) both;
 }
 
+/* Con movimiento reducido no hay recorridos ni entradas; los cambios de estado siguen visibles
+   (colores, tachados, lámina actual), solo que aparecen sin animación. */
 @media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }

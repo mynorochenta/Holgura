@@ -70,11 +70,11 @@ interface StepperProps {
 
 function Stepper({ label, value, min, max, onChange }: StepperProps) {
   const buttonClass =
-    'size-7 cursor-pointer text-base text-muted transition-colors duration-150 hover:text-ink active:scale-90 disabled:cursor-not-allowed disabled:opacity-30'
+    'size-9 cursor-pointer text-muted transition-colors duration-150 hover:text-ink active:scale-90 disabled:cursor-not-allowed disabled:opacity-30'
   return (
     <div className="flex items-center gap-2.5">
-      <span className="text-[13px] text-muted">{label}</span>
-      <div className="inline-flex items-center border border-line bg-paper">
+      <span className="text-[14px] text-muted">{label}</span>
+      <div className="inline-flex items-center rounded-[3px] border border-line bg-paper">
         <button
           type="button"
           className={buttonClass}
@@ -82,7 +82,9 @@ function Stepper({ label, value, min, max, onChange }: StepperProps) {
           disabled={value <= min}
           aria-label={`Quitar ${label.toLowerCase()}`}
         >
-          −
+          <svg aria-hidden viewBox="0 0 16 16" className="mx-auto size-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+            <path d="M3.5 8h9" />
+          </svg>
         </button>
         <span className="w-6 text-center font-display text-[15px]">{value}</span>
         <button
@@ -92,7 +94,9 @@ function Stepper({ label, value, min, max, onChange }: StepperProps) {
           disabled={value >= max}
           aria-label={`Agregar ${label.toLowerCase()}`}
         >
-          +
+          <svg aria-hidden viewBox="0 0 16 16" className="mx-auto size-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+            <path d="M3.5 8h9M8 3.5v9" />
+          </svg>
         </button>
       </div>
     </div>

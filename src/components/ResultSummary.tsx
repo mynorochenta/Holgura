@@ -3,7 +3,6 @@ import type { CSSProperties } from 'react'
 import { formatNumber, type Fraction, type NumberFormat } from '../core/fraction'
 import type { SimplexResult } from '../core/simplex'
 import type { Verification } from '../core/verify'
-import CountUp from './reactbits/CountUp'
 import { MathText, Var } from './MathText'
 import { resultTone, toneStyle } from './tone'
 
@@ -29,7 +28,9 @@ function VerificationLine({ verification }: { verification: Verification }) {
   if (verification.matches) {
     return (
       <div className="flex items-start gap-3">
-        <span aria-hidden className="mt-[7px] h-3 w-[3px] shrink-0 bg-sel" />
+        <svg aria-hidden viewBox="0 0 24 24" className="mt-0.5 size-6 shrink-0 text-sel" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3.5 12.8c1.7 1.3 3.4 3 4.9 5.2 3-5.6 6.9-10 12.1-13.6" />
+        </svg>
         <div>
           <p className="font-medium">Coincide con un solver independiente</p>
           <p className="text-[13px] text-muted">
@@ -40,7 +41,7 @@ function VerificationLine({ verification }: { verification: Verification }) {
     )
   }
   return (
-    <div className="flex items-start gap-3 border-l-[3px] border-err bg-err-t/50 px-3 py-2.5">
+    <div className="notice-error flex items-start gap-3">
       <div>
         <p className="font-medium">No coincide con el solver independiente</p>
         <p className="text-[13px]">
@@ -52,23 +53,20 @@ function VerificationLine({ verification }: { verification: Verification }) {
   )
 }
 
-/** Valor que cuenta desde 0 (Count Up) en decimales; en fracciones, entra con una transición. */
+/** Valor final: aparece con una transición corta (sin contar desde 0). */
 function CountedValue({ value, format }: { value: Fraction; format: NumberFormat }) {
   const reduce = useReducedMotion()
   const text = formatNumber(value, format)
-  if (format === 'fraction' || reduce) {
-    return (
-      <motion.span
-        key={text}
-        initial={reduce ? false : { opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: reduce ? 0 : 0.4 }}
-      >
-        {text}
-      </motion.span>
-    )
-  }
-  return <CountUp key={text} to={Number(value.valueOf().toFixed(4))} duration={1} />
+  return (
+    <motion.span
+      key={text}
+      initial={reduce ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduce ? 0 : 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+    >
+      {text}
+    </motion.span>
+  )
 }
 
 function ValueTile({
@@ -83,11 +81,11 @@ function ValueTile({
   emphasis?: boolean
 }) {
   return (
-    <div className={emphasis ? 'border-l-[3px] border-sel bg-sel-t/60 px-4 py-2.5' : 'py-2.5 pl-1'}>
-      <div className="font-display text-[15px] text-muted">
+    <div className={emphasis ? 'pr-6' : ''}>
+      <div className="font-display text-[16px] text-muted">
         <MathText text={name} />
       </div>
-      <div className={`font-display leading-tight tabular-nums ${emphasis ? 'text-[32px]' : 'text-[26px]'}`}>
+      <div className={`font-display leading-tight tabular-nums ${emphasis ? 'text-[40px] text-sel-ink' : 'text-[28px]'}`}>
         <CountedValue value={value} format={format} />
       </div>
     </div>
@@ -145,7 +143,7 @@ export function ResultSummary({
 
           {auxiliary.length > 0 && (
             <div className="mt-4 border-t border-rule pt-3.5">
-              <h4 className="kicker">Holguras y excesos</h4>
+              <h4 className="block-title">Holguras y excesos</h4>
               <dl className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 font-display text-[16px]">
                 {auxiliary.map((name) => (
                   <div key={name} className="flex gap-2">

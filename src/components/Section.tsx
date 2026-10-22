@@ -12,12 +12,12 @@ interface SectionProps {
 export const Section = forwardRef<HTMLElement, SectionProps>(function Section({ number, title, note, children }, ref) {
   const id = `seccion-${number}`
   return (
-    <section ref={ref} aria-labelledby={id} className="scroll-mt-4 border-t border-line pt-[18px] pb-7 sm:pl-5">
-      <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 id={id} className="font-display text-[23px] leading-tight font-normal">
+    <section ref={ref} aria-labelledby={id} className="scroll-mt-4 border-t border-line pt-7 pb-12">
+      <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h2 id={id} className="font-display text-[30px] leading-tight font-normal">
           {title}
         </h2>
-        {note && <div className="ml-auto text-xs text-muted">{note}</div>}
+        {note && <div className="ml-auto text-[13px] text-muted">{note}</div>}
       </div>
       {children}
     </section>
