@@ -50,6 +50,9 @@
 
 - **Verificación en vivo.** Cada vez que se resuelve un modelo, la aplicación lo resuelve también con javascript-lp-solver y muestra si coinciden el estado (óptimo, infactible, no acotado) y el valor de Z.
 
+## Cómo lo hice
+Lo construí con Claude Code. Yo decidí qué hacía la app y cómo: el método (Gran M), cómo se ven las tablas, los problemas de prueba y el diseño. Claude escribió la mayor parte del código y yo fui revisando y probando cada parte.
+
 ## Tecnología
 
 | Parte | Herramienta |

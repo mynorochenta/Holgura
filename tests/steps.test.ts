@@ -84,7 +84,7 @@ describe('Máx Z = 40x1 + 30x2 (dos restricciones ≤)', () => {
   const steps = buildSteps(result)
   const texts = steps.map((s) => describeStep(s, result))
 
-  it('una operación por paso, en el orden de la clase', () => {
+  it('una operación por paso, en el orden del método', () => {
     expect(steps.map((s) => s.kind)).toEqual([
       'initial',
       'enter', 'leave', 'scale', 'eliminate', 'objective',
@@ -99,7 +99,7 @@ describe('Máx Z = 40x1 + 30x2 (dos restricciones ≤)', () => {
     ])
   })
 
-  it('explica la tabla inicial con la fila Z de la clase', () => {
+  it('explica la tabla inicial con la fila Z del método', () => {
     expect(texts[0].explanation).toContain('Z − 40x1 − 30x2 = 0')
     expect(texts[0].explanation).toContain('holgura (S1 y S2)')
   })
